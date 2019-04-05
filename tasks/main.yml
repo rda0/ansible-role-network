@@ -1,0 +1,11 @@
+- block:
+
+    - block:
+
+        - name: include systemd
+          include_tasks: systemd.yml
+
+      tags: network_systemd
+      when: include_network_systemd
+
+  tags: network

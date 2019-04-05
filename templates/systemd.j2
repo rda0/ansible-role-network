@@ -1,0 +1,7 @@
+{% for section in sections %}
+[{{ section.name }}]
+{% for param in section.params %}
+{{ param }}
+{% endfor %}
+
+{% endfor %}
