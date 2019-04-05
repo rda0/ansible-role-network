@@ -33,8 +33,3 @@
   service:
     name: systemd-networkd
     enabled: yes
-
-- name: enable systemd-networkd-wait-online
-  service:
-    name: systemd-networkd-wait-online
-    enabled: yes
