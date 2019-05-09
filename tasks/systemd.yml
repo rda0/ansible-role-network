@@ -22,9 +22,9 @@
     enabled: yes
     state: started
 
-- name: use systemd stub resolver
+- name: use systemd resolver
   file:
-    src: /run/systemd/resolve/stub-resolv.conf
+    src: /run/systemd/resolve/resolv.conf
     dest: /etc/resolv.conf
     state: link
     force: yes
