@@ -33,3 +33,9 @@
   service:
     name: systemd-networkd
     enabled: yes
+
+#- name: disable networking
+#  service:
+#    name: networking
+#    enabled: no
+#  when: network_systemd_unit_networking_disable
