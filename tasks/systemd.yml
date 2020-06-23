@@ -1,3 +1,25 @@
+- block:
+  - name: disable service NetworkManager
+    service:
+      name: NetworkManager
+      enabled: no
+  - name: remove package network-manager
+    package:
+      pkg: network-manager
+      state: absent
+  when: network_systemd_remove_network_manager
+
+- block:
+  - name: remove packages for netplan
+    package:
+      pkg: ['netplan.io', 'libnetplan0']
+      state: absent
+  - name: remove /etc/netplan
+    file:
+      path: /etc/netplan
+      state: absent
+  when: network_systemd_remove_netplan
+
 - name: deploy networks
   template:
     src: systemd.j2
@@ -39,25 +61,3 @@
     name: networking
     enabled: no
   when: network_systemd_unit_networking_disable
-
-- block:
-  - name: disable service NetworkManager
-    service:
-      name: NetworkManager
-      enabled: no
-  - name: remove package network-manager
-    package:
-      pkg: network-manager
-      state: absent
-  when: network_systemd_remove_network_manager
-
-- block:
-  - name: remove packages for netplan
-    package:
-      pkg: ['netplan.io', 'libnetplan0']
-      state: absent
-  - name: remove /etc/netplan
-    file:
-      path: /etc/netplan
-      state: absent
-  when: network_systemd_remove_netplan
