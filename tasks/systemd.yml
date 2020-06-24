@@ -39,10 +39,11 @@
   loop: '{{ network_systemd_netdev }}'
 
 - name: enable and start systemd-resolved
-  service:
+  systemd:
     name: systemd-resolved
     enabled: yes
     state: started
+    daemon_reload: yes
 
 - name: use systemd resolver
   file:
@@ -51,10 +52,12 @@
     state: link
     force: yes
 
-- name: enable systemd-networkd
-  service:
+- name: enable and start systemd-networkd
+  systemd:
     name: systemd-networkd
     enabled: yes
+    state: started
+    daemon_reload: yes
 
 - name: disable networking
   service:
