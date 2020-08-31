@@ -24,6 +24,9 @@
   template:
     src: systemd.j2
     dest: '/etc/systemd/network/{{ item.name }}.network'
+    owner: root
+    group: root
+    mode: 0644
   vars:
     sections: '{{ item.sections }}'
   notify: restart systemd-networkd
@@ -33,6 +36,9 @@
   template:
     src: systemd.j2
     dest: '/etc/systemd/network/{{ item.name }}.netdev'
+    owner: root
+    group: root
+    mode: 0644
   vars:
     sections: '{{ item.sections }}'
   notify: restart systemd-networkd
