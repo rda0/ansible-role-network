@@ -42,6 +42,6 @@ network_systemd_network:
 
 For a detailed example with bonding, vlans and bridges, see `production/host_vars/phd-web/network.yml`
 
-Note: If you are bootstrapping a new host or enabling systemd-networkd for the first time, you should reboot the host after the play has been run. Only interfaces brought up will be configured by systemd-network. Migrating to `/run/systemd/resolve/stub-resolv.conf` as it is recommended and done in this role may break DNS resolution until the host is rebooted.
+Note: If you are bootstrapping a new host or enabling systemd-networkd for the first time, you should reboot the host after the play has been run. Only interfaces brought up will be configured by systemd-network. Migrating to `/run/systemd/resolve/resolv.conf` as it is recommended and done in this role may break DNS resolution until the host is rebooted.
 
 Note2: You probably should not migrate from another backend without careful testing and manual preparation.
