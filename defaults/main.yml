@@ -1,4 +1,5 @@
 include_network_systemd: False
+include_network_kernel_settings: False
 
 network_systemd_restart: True
 network_systemd_network: []
@@ -7,3 +8,10 @@ network_systemd_unit_networking_disable: False
 network_systemd_remove_network_manager: False
 network_systemd_remove_netplan: False
 network_systemd_networkd_wait_online_any: False
+
+network_multiple_interfaces_on_same_subnet: False
+network_kernel_settings_filename: "91-net.conf"
+network_kernel_settings_file: "/etc/sysctl.d/{{ network_kernel_settings_filename }}"
+network_kernel_settings:
+  net.ipv4.conf.all.arp_ignore: "{{ '1' if network_multiple_interfaces_on_same_subnet else '0' }}"
+  net.ipv4.conf.default.arp_filter: "{{ '1' if network_multiple_interfaces_on_same_subnet else '0' }}"

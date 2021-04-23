@@ -8,4 +8,12 @@
     tags: network_systemd
     when: include_network_systemd
 
+  - block:
+
+    - name: include kernel settings
+      include_tasks: kernel_settings.yml
+
+    tags: network_kernel_settings
+    when: include_network_kernel_settings
+
   tags: network
