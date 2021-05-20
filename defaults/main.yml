@@ -17,7 +17,7 @@ network_systemd_remove_netplan: False
 network_systemd_networkd_wait_online_any: False
 
 include_network_kernel_settings: "{{ True if 'bridge' in network_systemd_template }}"
-network_multiple_interfaces_on_same_subnet: "{{ False if network_interface in network_bond['interfaces']|default([]) else True }}"
+network_multiple_interfaces_on_same_subnet: "{{ False if network_interface in network_bridges|map(attribute='name')|flatten else True }}"
 network_kernel_settings_filename: "91-net.conf"
 network_kernel_settings_file: "/etc/sysctl.d/{{ network_kernel_settings_filename }}"
 network_kernel_settings:

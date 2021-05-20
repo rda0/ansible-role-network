@@ -41,7 +41,7 @@ network_systemd_network_templates:
       - name: Network
         params: '{{ network_systemd_host_address_params }}'
   bond_2vlans_2bridges:
-    - name: '{{ network_interface }}'
+    - name: "{{ '' if network_interface in network_bridges|map(attribute='name')|flatten else 'host' }}"
       sections:
       - name: Match
         params: ['Name={{ network_interface }}']
@@ -85,7 +85,7 @@ network_systemd_network_templates:
       - name: Match
         params: ["Name={{ network_bridges[0]['name'] }}"]
       - name: Network
-        params: ['IPv6AcceptRA=false']
+        params: "{{ network_systemd_host_address_params if network_interface in network_bridges|map(attribute='name')|flatten else ['IPv6AcceptRA=false'] }}"
     - name: "{{ network_bridges[1]['name'] }}"
       sections:
       - name: Match
