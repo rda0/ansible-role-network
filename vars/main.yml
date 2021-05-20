@@ -1,0 +1,43 @@
+network_systemd_domains: phys.ethz.ch ethz.ch
+network_systemd_dns_ipv4: 129.132.98.12
+network_systemd_dns_ipv6: 2001:67c:10ec::c
+
+network_systemd_network_temlates:
+  default_dhcp:
+    - name: en
+      sections:
+      - name: Match
+        params: ['Name={{ network_interface }}']
+      - name: Network
+        params: ['DHCP=ipv4', 'Domains={{ network_systemd_domains }}']
+      - name: DHCP
+        params: ['UseDomains=true', 'UseNTP=true']
+  default_static:
+    - name: eth0
+      sections:
+      - name: Match
+        params: ['Name={{ network_interface }}']
+      - name: Network
+        params:
+          - "Address={{ globalvars[inventory_hostname]['ipv4'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['prefixlen'] }}"
+          - "Gateway={{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['gateway_address'] }}"
+          - 'DNS={{ network_systemd_dns_ipv4 }}'
+          - 'Domains={{ network_systemd_domains }}'
+          - "Address={{ globalvars[inventory_hostname]['ipv6'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv6_subnet']]['prefixlen'] }}"
+          - 'DNS={{ network_systemd_dns_ipv6 }}'
+  default_static_ipv4_only:
+    - name: eth0
+      sections:
+      - name: Match
+        params: ['Name={{ network_interface }}']
+      - name: Network
+        params:
+          - "Address={{ globalvars[inventory_hostname]['ipv4'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['prefixlen'] }}"
+          - "Gateway={{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['gateway_address'] }}"
+          - 'DNS={{ network_systemd_dns_ipv4 }}'
+          - 'Domains={{ network_systemd_domains }}'
+
+network_systemd_netdev_temlates:
+  default_dhcp: []
+  default_static: []
+  default_static_ipv4_only: []
