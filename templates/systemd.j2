@@ -1,7 +1,9 @@
 {% for section in sections %}
 [{{ section.name }}]
 {% for param in section.params %}
+{% if param != '' %}
 {{ param }}
+{% endif %}
 {% endfor %}
 
 {% endfor %}

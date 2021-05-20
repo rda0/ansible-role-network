@@ -23,19 +23,8 @@ network_systemd_network_temlates:
           - "Gateway={{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['gateway_address'] }}"
           - 'DNS={{ network_systemd_dns_ipv4 }}'
           - 'Domains={{ network_systemd_domains }}'
-          - "Address={{ globalvars[inventory_hostname]['ipv6'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv6_subnet']]['prefixlen'] }}"
-          - 'DNS={{ network_systemd_dns_ipv6 }}'
-  default_static_ipv4_only:
-    - name: eth0
-      sections:
-      - name: Match
-        params: ['Name={{ network_interface }}']
-      - name: Network
-        params:
-          - "Address={{ globalvars[inventory_hostname]['ipv4'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['prefixlen'] }}"
-          - "Gateway={{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['gateway_address'] }}"
-          - 'DNS={{ network_systemd_dns_ipv4 }}'
-          - 'Domains={{ network_systemd_domains }}'
+          - "{% if 'ipv6' in globalvars[inventory_hostname] %}Address={{ globalvars[inventory_hostname]['ipv6'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv6_subnet']]['prefixlen'] }}{% endif %}"
+          - "{% if 'ipv6' in globalvars[inventory_hostname] %}DNS={{ network_systemd_dns_ipv6 }}{% endif %}"
 
 network_systemd_netdev_temlates:
   default_dhcp: []
