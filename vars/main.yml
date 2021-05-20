@@ -13,7 +13,7 @@ network_systemd_network_temlates:
       - name: DHCP
         params: ['UseDomains=true', 'UseNTP=true']
   default_static:
-    - name: eth0
+    - name: '{{ network_interface }}'
       sections:
       - name: Match
         params: ['Name={{ network_interface }}']
