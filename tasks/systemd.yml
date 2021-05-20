@@ -20,6 +20,20 @@
       state: absent
   when: network_systemd_remove_netplan
 
+- name: detect files to wipe
+  find:
+    paths: /etc/systemd/network
+    patterns: '*.net*'
+  register: network_systemd_files_to_wipe
+  when: network_systemd_wipe
+
+- name: wipe files
+  file:
+    path: '{{ item.path }}'
+    state: absent
+  loop: '{{ network_systemd_files_to_wipe.files }}'
+  when: network_systemd_wipe
+
 - name: deploy networks
   template:
     src: systemd.j2
