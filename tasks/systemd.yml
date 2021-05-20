@@ -42,9 +42,10 @@
     group: root
     mode: 0644
   vars:
+    name: '{{ item.name }}'
     sections: '{{ item.sections }}'
   notify: restart systemd-networkd
-  loop: '{{ network_systemd_network }}'
+  loop: "{{ network_systemd_network|rejectattr('name', 'equalto', '')|list }}"
 
 - name: deploy netdevs
   template:
@@ -54,9 +55,10 @@
     group: root
     mode: 0644
   vars:
+    name: '{{ item.name }}'
     sections: '{{ item.sections }}'
   notify: restart systemd-networkd
-  loop: '{{ network_systemd_netdev }}'
+  loop: "{{ network_systemd_netdev|rejectattr('name', 'equalto', '')|list }}"
 
 - name: enable and start systemd-resolved
   systemd:
