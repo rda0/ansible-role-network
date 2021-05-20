@@ -1,7 +1,7 @@
 include_network_systemd: False
 include_network_kernel_settings: False
 
-network_interface: en*
+#network_interface: en*
 network_bond: {}
 network_vlans: {}
 network_bridges: {}
