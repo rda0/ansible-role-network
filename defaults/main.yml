@@ -1,5 +1,4 @@
 include_network_systemd: False
-include_network_kernel_settings: False
 
 #network_interface: en*
 network_bond: {}
@@ -10,14 +9,15 @@ network_systemd_restart: True
 network_systemd_wipe: False
 network_systemd_clean_install: False
 network_systemd_template: default_dhcp
-network_systemd_network: '{{ network_systemd_network_temlates[network_systemd_template] }}'
-network_systemd_netdev: '{{ network_systemd_netdev_temlates[network_systemd_template] }}'
+network_systemd_network: '{{ network_systemd_network_templates[network_systemd_template] }}'
+network_systemd_netdev: '{{ network_systemd_netdev_templates[network_systemd_template] }}'
 network_systemd_unit_networking_disable: False
 network_systemd_remove_network_manager: False
 network_systemd_remove_netplan: False
 network_systemd_networkd_wait_online_any: False
 
-network_multiple_interfaces_on_same_subnet: False
+include_network_kernel_settings: "{{ True if 'bridge' in network_systemd_template }}"
+network_multiple_interfaces_on_same_subnet: "{{ False if network_interface in network_bond['interfaces']|default([]) else True }}"
 network_kernel_settings_filename: "91-net.conf"
 network_kernel_settings_file: "/etc/sysctl.d/{{ network_kernel_settings_filename }}"
 network_kernel_settings:
