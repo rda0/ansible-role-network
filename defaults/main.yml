@@ -4,7 +4,7 @@ include_network_kernel_settings: False
 #network_interface: en*
 network_bond: {}
 network_vlans: {}
-network_bridges: {}
+network_bridges: []
 
 network_systemd_restart: True
 network_systemd_wipe: False

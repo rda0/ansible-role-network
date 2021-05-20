@@ -2,6 +2,14 @@ network_systemd_domains: phys.ethz.ch ethz.ch
 network_systemd_dns_ipv4: 129.132.98.12
 network_systemd_dns_ipv6: 2001:67c:10ec::c
 
+network_systemd_host_address_params:
+  - "Address={{ globalvars[inventory_hostname]['ipv4'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['prefixlen'] }}"
+  - "Gateway={{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['gateway_address'] }}"
+  - 'DNS={{ network_systemd_dns_ipv4 }}'
+  - 'Domains={{ network_systemd_domains }}'
+  - "{% if 'ipv6' in globalvars[inventory_hostname] %}Address={{ globalvars[inventory_hostname]['ipv6'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv6_subnet']]['prefixlen'] }}{% endif %}"
+  - "{% if 'ipv6' in globalvars[inventory_hostname] %}DNS={{ network_systemd_dns_ipv6 }}{% endif %}"
+
 network_systemd_network_temlates:
   default_dhcp:
     - name: en
@@ -18,15 +26,30 @@ network_systemd_network_temlates:
       - name: Match
         params: ['Name={{ network_interface }}']
       - name: Network
-        params:
-          - "Address={{ globalvars[inventory_hostname]['ipv4'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['prefixlen'] }}"
-          - "Gateway={{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['gateway_address'] }}"
-          - 'DNS={{ network_systemd_dns_ipv4 }}'
-          - 'Domains={{ network_systemd_domains }}'
-          - "{% if 'ipv6' in globalvars[inventory_hostname] %}Address={{ globalvars[inventory_hostname]['ipv6'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv6_subnet']]['prefixlen'] }}{% endif %}"
-          - "{% if 'ipv6' in globalvars[inventory_hostname] %}DNS={{ network_systemd_dns_ipv6 }}{% endif %}"
+        params: '{{ network_systemd_host_address_params }}'
+  bridge_static:
+  - name: '{{ network_interface }}'
+    sections:
+    - name: Match
+      params: ['Name={{ network_interface }}']
+    - name: Network
+      params: ["Bridge={{ network_bridges[0]['name'] }}"]
+  - name: "{{ network_bridges[0]['name'] }}"
+    sections:
+    - name: Match
+      params: ["Name={{ network_bridges[0]['name'] }}"]
+    - name: Network
+      params: '{{ network_systemd_host_address_params }}'
 
 network_systemd_netdev_temlates:
   default_dhcp: []
   default_static: []
-  default_static_ipv4_only: []
+  bridge_static:
+    - name: "{{ network_bridges[0]['name'] }}"
+      sections:
+      - name: NetDev
+        params:
+          - "Name={{ network_bridges[0]['name'] }}"
+          - 'Kind=bridge'
+      - name: Bridge
+        params: ['STP=off']
