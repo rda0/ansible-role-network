@@ -8,7 +8,7 @@ network_systemd_host_address_params:
 
 network_systemd_network_templates:
   default_dhcp:
-    - name: en
+    - name: host
       sections:
       - name: Match
         params: ['Name={{ network_interface }}']
@@ -17,7 +17,7 @@ network_systemd_network_templates:
       - name: DHCP
         params: ['UseDomains=true', 'UseNTP=true']
   default_static:
-    - name: '{{ network_interface }}'
+    - name: host
       sections:
       - name: Match
         params: ['Name={{ network_interface }}']
