@@ -3,10 +3,14 @@
     service:
       name: NetworkManager
       enabled: no
+    ignore_errors: True
+    failed_when: False
   - name: remove package network-manager
     package:
       pkg: network-manager
       state: absent
+    ignore_errors: True
+    failed_when: False
   when: network_systemd_remove_network_manager
 
 - block:
@@ -85,6 +89,8 @@
   service:
     name: networking
     enabled: no
+  ignore_errors: True
+  failed_when: False
   when: network_systemd_unit_networking_disable
 
 - name: create systemd-networkd-wait-online.service.d directory
