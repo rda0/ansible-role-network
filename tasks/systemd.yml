@@ -93,6 +93,12 @@
   failed_when: False
   when: network_systemd_unit_networking_disable
 
+- name: truncate /etc/network/interfaces
+  copy:
+    content: ''
+    dest: /etc/network/interfaces
+  when: network_systemd_etc_network_interfaces_truncate
+
 - name: create systemd-networkd-wait-online.service.d directory
   file:
     path: /etc/systemd/system/systemd-networkd-wait-online.service.d
