@@ -5,6 +5,10 @@ network_bond: {}
 network_vlans: {}
 network_bridges: []
 
+network_systemd_domains: phys.ethz.ch ethz.ch
+network_systemd_dns_ipv4: 129.132.98.12
+network_systemd_dns_ipv6: 2001:67c:10ec::c
+
 network_systemd_restart: True
 network_systemd_wipe: False
 network_systemd_clean_install: True
@@ -12,6 +16,7 @@ network_systemd_template: default_dhcp
 network_systemd_network: '{{ network_systemd_network_templates[network_systemd_template] }}'
 network_systemd_netdev: '{{ network_systemd_netdev_templates[network_systemd_template] }}'
 network_systemd_unit_networking_disable: '{{ network_systemd_clean_install }}'
+#interfaces_wipe
 network_systemd_remove_network_manager: '{{ network_systemd_clean_install }}'
 network_systemd_remove_netplan: '{{ network_systemd_clean_install }}'
 network_systemd_networkd_wait_online_any: False
