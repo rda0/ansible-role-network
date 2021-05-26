@@ -24,6 +24,11 @@
       state: absent
   when: network_systemd_remove_netplan
 
+- name: remove /etc/systemd/network/99-default.link
+  file:
+    path: /etc/systemd/network/99-default.link
+    state: absent
+
 - name: detect files to wipe
   find:
     paths: /etc/systemd/network
