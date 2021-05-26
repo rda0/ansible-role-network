@@ -6,6 +6,16 @@ network_systemd_host_address_params:
   - "{% if 'ipv6' in globalvars[inventory_hostname] %}Address={{ globalvars[inventory_hostname]['ipv6'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv6_subnet']]['prefixlen'] }}{% endif %}"
   - "{% if 'ipv6' in globalvars[inventory_hostname] %}DNS={{ network_systemd_dns_ipv6 }}{% endif %}"
 
+network_systemd_host_address_params_ad_dns:
+  - "Address={{ globalvars[inventory_hostname]['ipv4'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['prefixlen'] }}"
+  - "Gateway={{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['gateway_address'] }}"
+  - 'DNS=129.132.80.31'
+  - 'DNS=129.132.80.26'
+  - 'DNS=129.132.80.45'
+  - 'Domains=ad.phys.ethz.ch phys.ethz.ch ethz.ch'
+  - "{% if 'ipv6' in globalvars[inventory_hostname] %}Address={{ globalvars[inventory_hostname]['ipv6'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv6_subnet']]['prefixlen'] }}{% endif %}"
+  - "{% if 'ipv6' in globalvars[inventory_hostname] %}DNS={{ network_systemd_dns_ipv6 }}{% endif %}"
+
 network_systemd_network_templates:
   default_dhcp:
     - name: host
