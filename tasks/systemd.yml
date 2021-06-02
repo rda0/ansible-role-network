@@ -69,6 +69,12 @@
   notify: restart systemd-networkd
   loop: "{{ network_systemd_netdev|rejectattr('name', 'equalto', '')|list }}"
 
+- name: deploy /etc/systemd/resolved.conf
+  template:
+    src: resolved.conf.j2
+    dest: /etc/systemd/resolved.conf
+  notify: restart systemd-resolved
+
 - name: enable and start systemd-resolved
   systemd:
     name: systemd-resolved
@@ -111,10 +117,10 @@
     state: absent
   when: network_systemd_etc_network_interfaces_d_remove
 
-- name: kill dhclient
-  shell: 'if [ "$(pidof dhclient)" ]; then kill "$(pidof dhclient)"; fi'
-  changed_when: False
-  when: network_systemd_unit_networking_disable and network_systemd_etc_network_interfaces_truncate and network_systemd_etc_network_interfaces_truncate_result.changed
+#- name: kill dhclient
+#  shell: 'if [ "$(pidof dhclient)" ]; then kill "$(pidof dhclient)"; fi'
+#  changed_when: False
+#  when: network_systemd_unit_networking_disable and network_systemd_etc_network_interfaces_truncate and network_systemd_etc_network_interfaces_truncate_result.changed
 
 - name: create systemd-networkd-wait-online.service.d directory
   file:
