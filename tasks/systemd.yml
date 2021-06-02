@@ -102,6 +102,7 @@
   copy:
     content: ''
     dest: /etc/network/interfaces
+  register: network_systemd_etc_network_interfaces_truncate_result
   when: network_systemd_etc_network_interfaces_truncate
 
 - name: remove /etc/network/interfaces.d
@@ -109,6 +110,11 @@
     path: /etc/network/interfaces.d
     state: absent
   when: network_systemd_etc_network_interfaces_d_remove
+
+- name: kill dhclient
+  shell: 'if [ "$(pidof dhclient)" ]; then kill "$(pidof dhclient)"; fi'
+  changed_when: False
+  when: network_systemd_unit_networking_disable and network_systemd_etc_network_interfaces_truncate and network_systemd_etc_network_interfaces_truncate_result.changed
 
 - name: create systemd-networkd-wait-online.service.d directory
   file:
