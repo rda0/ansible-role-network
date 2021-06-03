@@ -104,6 +104,12 @@
   failed_when: False
   when: network_systemd_unit_networking_disable
 
+- name: make sure /etc/network exists
+  file:
+    path: /etc/network
+    state: directory
+  when: network_systemd_etc_network_interfaces_truncate
+
 - name: truncate /etc/network/interfaces
   copy:
     content: ''
