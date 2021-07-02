@@ -141,6 +141,12 @@
   notify: reload systemd
   when: network_systemd_networkd_wait_online_any
 
+- name: enable systemd-networkd-wait-online.service
+  systemd:
+    name: systemd-networkd-wait-online
+    enabled: yes
+  when: network_systemd_networkd_wait_online_any
+
 - name: remove systemd-networkd-wait-online.service override
   file:
     path: /etc/systemd/system/systemd-networkd-wait-online.service.d
