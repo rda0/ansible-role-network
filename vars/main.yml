@@ -65,6 +65,27 @@ network_systemd_network_templates:
         params: ["Name={{ network_bond['name']|default('') }}"]
       - name: Network
         params: "{{ network_systemd_host_address_params + [''.join(['BindCarrier=', network_bond['interfaces'][0]|default(''), ' ', network_bond['interfaces'][1]|default('')])] }}"
+  bond_dhcp:
+    - name: "{{ network_bond['interfaces'][0]|default('') }}"
+      sections:
+      - name: Match
+        params: ["Name={{ network_bond['interfaces'][0]|default('') }}"]
+      - name: Network
+        params: ["Bond={{ network_bond['name']|default('') }}"]
+    - name: "{{ network_bond['interfaces'][1]|default('') }}"
+      sections:
+      - name: Match
+        params: ["Name={{ network_bond['interfaces'][1]|default('') }}"]
+      - name: Network
+        params: ["Bond={{ network_bond['name']|default('') }}"]
+    - name: "{{ network_bond['name']|default('') }}"
+      sections:
+      - name: Match
+        params: ["Name={{ network_bond['name']|default('') }}"]
+      - name: Network
+        params: ['DHCP=ipv4', 'Domains={{ network_systemd_domains }}']
+      - name: DHCP
+        params: ['UseDomains=true', 'UseNTP=true']
   bond_2vlans_2bridges:
     - name: "{{ '' if network_interface in network_bridges|map(attribute='name')|flatten else 'host' }}"
       sections:
@@ -131,6 +152,19 @@ network_systemd_netdev_templates:
       - name: Bridge
         params: ['STP=off']
   bond_static:
+    - name: "{{ network_bond['name']|default('') }}"
+      sections:
+      - name: NetDev
+        params:
+          - "Name={{ network_bond['name']|default('') }}"
+          - 'Kind=bond'
+      - name: Bond
+        params:
+          - 'Mode=802.3ad'
+          - 'TransmitHashPolicy=layer3+4'
+          - 'MIIMonitorSec=1s'
+          - 'LACPTransmitRate=fast'
+  bond_dhcp:
     - name: "{{ network_bond['name']|default('') }}"
       sections:
       - name: NetDev
