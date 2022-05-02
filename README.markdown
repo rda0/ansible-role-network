@@ -8,7 +8,9 @@ This role configures the network. The following backends are currently supported
 systemd-networkd
 ----------------
 
-Two variables `network_systemd_network` and `network_systemd_netdev` define the files (`*.network` and `*.netdev`) created in `/etc/systemd/network`. Each variable may contain a list of dictionaries with keys `name` (the filename) and `sections` (the file content). `sections` contains a list of sections to be created in the file. The `params` field contains the list of parameters to be listed in the section named after the value of `section.name`.
+Two variables `network_systemd_network` and `network_systemd_netdev` can be used to override the default configuration, which is using preset templates. They define the files (`*.network` and `*.netdev`) created in `/etc/systemd/network`. Each variable may contain a list of dictionaries with keys `name` (the filename) and `sections` (the file content). `sections` contains a list of sections to be created in the file. The `params` field contains the list of parameters to be listed in the section named after the value of `section.name`.
+
+Usually these two variables should not be used in per host configs, as they are preset with templates by default (see below). Instead use the variables `network_systemd_network_local` and `network_systemd_netdev_local`, which are merged with the preset variables.
 
 The syntax is as follows:
 
@@ -46,6 +48,38 @@ Hosts configured as such with mutliple interfaces need the following setting to 
 network_systemd_networkd_wait_online_any: True
 ```
 
+Another example to configure an interface in addition to preset interfaces:
+
+```yaml
+network_systemd_network_local:
+  - name: "eth1"
+    sections:
+    - name: Match
+      params: ['Name=eth1']
+    - name: Network
+      params:
+        - 'IPv6AcceptRA=false'
+        - 'ConfigureWithoutCarrier=true'
+    - name: Address
+      params:
+        - "Address=192.168.0.42/24"
+        - 'Scope=link'
+```
+
+Or to create additional interfaces:
+
+```yaml
+network_systemd_netdev_local:
+  - name: tun0
+    sections:
+    - name: NetDev
+      params:
+        - 'Name=tun0'
+        - 'Kind=tun'
+```
+
+### bootstrapping
+
 Note: If you are bootstrapping a new host or enabling systemd-networkd for the first time, you should reboot the host after the play has been run. Only interfaces brought up will be configured by systemd-network. Migrating to `/run/systemd/resolve/resolv.conf` as it is recommended and done in this role may break DNS resolution until the host is rebooted.
 
 ### templates
@@ -61,6 +95,28 @@ Optional variables (for bridge templates):
 - `network_bond`
 - `network_vlans`
 - `network_bridges`
+
+Example:
+
+```yaml
+network_systemd_template: bond_2vlans_2bridges
+network_interface: br-dc2552
+network_bond:
+  name: bond1
+  interfaces: ['eno3', 'eno4']
+network_vlans:
+  vlans:
+    - name: dc2552
+      id: 2552
+    - name: dc2745
+      id: 2745
+  interface: bond1
+network_bridges:
+  - name: br-dc2552
+    interface: dc2552
+  - name: br-dc2745
+    interface: dc2745
+```
 
 ### defaults
 
