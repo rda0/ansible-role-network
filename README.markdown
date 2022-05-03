@@ -3,7 +3,7 @@ network
 
 This role configures the network. The following backends are currently supported:
 
-- systemd-networkd: `include_network_systemd: True`
+- systemd-networkd: `import_network_systemd: True`
 
 systemd-networkd
 ----------------
@@ -125,8 +125,26 @@ For details see `defaults/main.yml`.
 - `network_systemd_clean_install`: By default the role will perform a clean install, removing/disabling any other known default Debian/Ubuntu network configuration
 - `network_systemd_wipe`: Should only manually be set to `True` via command line parameter (`-e network_systemd_wipe=True`), when `/etc/systemd/network` is expected to have existing configration files not needed anymore or when `.network` or `.netdev` file names change
 
-### kernel settings
+kernel settings
+---------------
 
-The role may need to set some kernel parameters, this is only active when needed (`include_network_kernel_settings`). It will automatically enable that when a template name contains the string `bridge` and use the approriate settings.
+The role may need to set some kernel parameters (`import_network_kernel_settings`). Some are automatically set and some need to be manually set (see `defaults/main.yml`).
 
-If multiple interfaces are connected to the same layer 2 subnet, some kernel settings need tuning to avoid possible network problems. This is automatically detected for bridge templates, when they are using the variables `network_interface` and `network_bridges`.
+Should a setting change to use the kernel's default setting, either a reboot or manually resetting is needed.
+
+### network_multiple_interfaces_on_same_subnet
+
+If multiple interfaces are connected to the same layer 2 subnet (vlan) and even if no IP address is configured on some interfaces, then kernel settings need tuning to avoid possible network or network monitoring infrastructure problems.
+This is automatically tuned for bridge templates, when they are using the variables `network_interface` and `network_bridges` and when the host is configured with a dedicated management interface (assuming bridge and management interface are on the same subnet).
+By default the kernel is configured to respond to ARP requests for a given IP address on any interface to increase the chance of successful communication. But from the perspective of a network monitoring infrastructure this may appear as an IP address which is configured on multiple interfaces (MAC addresses).
+For such cases set `network_multiple_interfaces_on_same_subnet: True`.
+
+See also:
+
+- https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
+- https://wiki.openvz.org/Multiple_network_interfaces_and_ARP_flux
+- https://lwn.net/Articles/45373/
+
+### network_ipv4_ip_forward
+
+Set to `True` to enable IPv4 forwarding to configure the host as a router. This may also be set dynamically by software like libvirt or other hypervisors (container, vms) when needed.

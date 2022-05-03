@@ -1,9 +1,9 @@
 - name: apply sysctl kernel settings
   sysctl:
-    name: '{{ item }}'
-    value: '{{ network_kernel_settings[item] }}'
     sysctl_file: '{{ network_kernel_settings_file }}'
-    reload: yes
-  loop:
-    - net.ipv4.conf.all.arp_ignore
-    - net.ipv4.conf.default.arp_filter
+    name: '{{ item.name }}'
+    value: '{{ item.value }}'
+    state: "{{ 'present' if item.value != item.default else 'absent' }}"
+    sysctl_set: "{{ True if item.value != item.default else False }}"
+    reload: no
+  loop: '{{ network_kernel_settings }}'

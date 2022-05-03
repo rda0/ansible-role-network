@@ -1,4 +1,6 @@
-include_network_systemd: False
+role_network: False
+import_network_systemd: True
+import_network_kernel_settings: True
 
 #network_interface: en*
 network_bond: {}
@@ -26,10 +28,28 @@ network_systemd_remove_dhcpcd: '{{ network_systemd_clean_install }}'
 network_systemd_networkd_wait_online_any: False
 network_systemd_resolved_conf: ''
 
-include_network_kernel_settings: "{{ True if 'bridge' in network_systemd_template else False }}"
-network_multiple_interfaces_on_same_subnet: "{{ False if network_interface in network_bridges|map(attribute='name')|flatten else True }}"
+# Automatically detect when template contains a bridge
+_network_has_bridge: "{{ True if 'bridge' in network_systemd_template else False }}"
+# Automatically detect when template contains a bridge and has a dedicated management interface not on the bridge
+_network_has_bridge_and_management_interface: "{{ True if _network_has_bridge and network_interface not in network_bridges|map(attribute='name')|flatten else False }}"
+# Manually set this flag in host_vars if multiple interfaces are on the same layer 2 subnet (vlan)
+# Automatically set this flag for bridged templates with dedicated management interface,
+# assuming both bridge and management interface are on the same layer 2 subnet (vlan)
+network_multiple_interfaces_on_same_subnet: "{{ True if _network_has_bridge_and_management_interface else False }}"
+network_ipv4_ip_forward: False
 network_kernel_settings_filename: "91-net.conf"
 network_kernel_settings_file: "/etc/sysctl.d/{{ network_kernel_settings_filename }}"
+# List of kernel settings to configure via sysctl
+# - value: the desired value
+# - default: the kernel's default value
+# Will only be modified/configured if value is not equal to default
 network_kernel_settings:
-  net.ipv4.conf.all.arp_ignore: "{{ '1' if network_multiple_interfaces_on_same_subnet else '0' }}"
-  net.ipv4.conf.default.arp_filter: "{{ '1' if network_multiple_interfaces_on_same_subnet else '0' }}"
+  - name: net.ipv4.conf.all.arp_ignore
+    value: "{{ '1' if network_multiple_interfaces_on_same_subnet else '0' }}"
+    default: '0'
+  - name: net.ipv4.conf.default.arp_filter
+    value: "{{ '1' if network_multiple_interfaces_on_same_subnet else '0' }}"
+    default: '0'
+  - name: net.ipv4.ip_forward
+    value: "{{ '1' if network_ipv4_ip_forward else '0' }}"
+    default: '0'
