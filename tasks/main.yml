@@ -1,4 +1,5 @@
-- block:
+- name: tags-block
+  block:
 
   - import_tasks: systemd.yml
     tags: network_systemd

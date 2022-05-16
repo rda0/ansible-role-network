@@ -1,4 +1,5 @@
-- block:
+- name: remove network manager
+  block:
   - name: disable service NetworkManager
     service:
       name: NetworkManager
@@ -13,7 +14,8 @@
     failed_when: False
   when: network_systemd_remove_network_manager
 
-- block:
+- name: remove netplan
+  block:
   - name: remove packages for netplan
     package:
       pkg: ['netplan.io', 'libnetplan0']
