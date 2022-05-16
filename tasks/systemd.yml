@@ -4,13 +4,13 @@
     service:
       name: NetworkManager
       enabled: no
-    ignore_errors: True
+    ignore_errors: True  # noqa ignore-errors
     failed_when: False
   - name: remove package network-manager
     package:
       pkg: network-manager
       state: absent
-    ignore_errors: True
+    ignore_errors: True  # noqa ignore-errors
     failed_when: False
   when: network_systemd_remove_network_manager
 
@@ -30,7 +30,7 @@
   package:
     pkg: dhcpcd5
     state: absent
-  ignore_errors: True
+  ignore_errors: True  # noqa ignore-errors
   failed_when: False
   when: network_systemd_remove_dhcpcd
 
@@ -83,6 +83,9 @@
   template:
     src: resolved.conf.j2
     dest: /etc/systemd/resolved.conf
+    owner: root
+    group: root
+    mode: 0644
   notify: restart systemd-resolved
 
 - name: enable and start systemd-resolved
@@ -110,7 +113,7 @@
   service:
     name: networking
     enabled: no
-  ignore_errors: True
+  ignore_errors: True  # noqa ignore-errors
   failed_when: False
   when: network_systemd_unit_networking_disable
 
@@ -118,12 +121,18 @@
   file:
     path: /etc/network
     state: directory
+    owner: root
+    group: root
+    mode: 0755
   when: network_systemd_etc_network_interfaces_truncate
 
 - name: truncate /etc/network/interfaces
   copy:
     content: ''
     dest: /etc/network/interfaces
+    owner: root
+    group: root
+    mode: 0644
   register: network_systemd_etc_network_interfaces_truncate_result
   when: network_systemd_etc_network_interfaces_truncate
 
@@ -142,12 +151,18 @@
   file:
     path: /etc/systemd/system/systemd-networkd-wait-online.service.d
     state: directory
+    owner: root
+    group: root
+    mode: 0755
   when: network_systemd_networkd_wait_online_any
 
 - name: deploy systemd-networkd-wait-online.service override
   template:
     src: systemd-networkd-wait-online.service.j2
     dest: /etc/systemd/system/systemd-networkd-wait-online.service.d/override.conf
+    owner: root
+    group: root
+    mode: 0644
   notify: reload systemd
   when: network_systemd_networkd_wait_online_any
 
