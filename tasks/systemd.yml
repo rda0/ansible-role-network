@@ -64,7 +64,7 @@
     name: '{{ item.name }}'
     sections: '{{ item.sections }}'
   notify: restart systemd-networkd
-  loop: "{{ network_systemd_network|rejectattr('name', 'equalto', '')|list }}"
+  loop: "{{ network_systemd_network | rejectattr('name', 'equalto', '') | list }}"
 
 - name: deploy netdevs
   template:
@@ -77,7 +77,7 @@
     name: '{{ item.name }}'
     sections: '{{ item.sections }}'
   notify: restart systemd-networkd
-  loop: "{{ network_systemd_netdev|rejectattr('name', 'equalto', '')|list }}"
+  loop: "{{ network_systemd_netdev | rejectattr('name', 'equalto', '') | list }}"
 
 - name: deploy /etc/systemd/resolved.conf
   template:
