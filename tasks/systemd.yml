@@ -88,6 +88,30 @@
     mode: 0644
   notify: restart systemd-resolved
 
+- name: install libnss-resolve
+  package:
+    name: libnss-resolve
+    state: "{{ network_systemd_resolved_libnss | ternary('present', 'absent') }}"
+
+- name: create systemd-resolved.service.d
+  file:
+    path: /etc/systemd/system/systemd-resolved.service.d
+    state: "{{ network_systemd_resolved_debug | ternary('directory', 'absent') }}"
+    owner: root
+    group: root
+    mode: 0755
+  notify: restart systemd-resolved
+
+- name: override systemd-resolved.service
+  template:
+    src: systemd-resolved.override.conf.j2
+    dest: /etc/systemd/system/systemd-resolved.service.d/override.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart systemd-resolved
+  when: network_systemd_resolved_debug
+
 - name: enable and start systemd-resolved
   systemd:
     name: systemd-resolved
