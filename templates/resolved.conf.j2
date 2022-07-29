@@ -1,7 +1,9 @@
 [Resolve]
 {% if network_systemd_resolved_global_dns %}
+{% if network_systemd_dns_ipv4 %}
 DNS={{ network_systemd_dns_ipv4 }}
-{% if 'ipv6' in globalvars[inventory_hostname] %}
+{% endif %}
+{% if network_systemd_dns_ipv6 and 'ipv6' in globalvars[inventory_hostname] %}
 DNS={{ network_systemd_dns_ipv6 }}
 {% endif %}
 {% endif %}
