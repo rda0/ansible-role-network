@@ -8,7 +8,16 @@ network_vlans: {}
 network_bridges: []
 
 network_systemd_domains: phys.ethz.ch ethz.ch
-network_systemd_dns_ipv4: 129.132.98.12
+# Due to a limitation in linux (`man resolv.conf`) and some network utilities (like `host`),
+# it is not possible to use more than 3 nameservers. systemd-networkd will work just fine,
+# but the generated `/etc/resolv.conf`, which is used by programs bypassing the libc resolver api,
+# will contain a comment after the third nameserver entry:
+#   Too many DNS servers configured, the following entries may be ignored.
+# and after that list the remaining nameservers and then the search domains.
+# Single-label host lookups (`host <hostname>`) will break: `Host <hostname> not found: 3(NXDOMAIN)`
+#
+# Use max 3 nameservers:
+network_systemd_dns_ipv4: 129.132.98.12 129.132.250.2
 network_systemd_dns_ipv6: 2001:67c:10ec::c
 
 network_systemd_restart: True
