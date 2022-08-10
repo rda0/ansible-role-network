@@ -119,12 +119,21 @@
     state: started
     daemon_reload: yes
 
-- name: use systemd resolver
+- name: use systemd resolv.conf
   file:
     src: /run/systemd/resolve/resolv.conf
     dest: /etc/resolv.conf
     state: link
     force: yes
+  when: not network_systemd_resolved_stub
+
+- name: use systemd stub-resolv.conf
+  file:
+    src: /run/systemd/resolve/stub-resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: yes
+  when: network_systemd_resolved_stub
 
 - name: enable and start systemd-networkd
   systemd:

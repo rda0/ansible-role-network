@@ -40,6 +40,7 @@ network_systemd_resolved_libnss: True
 network_systemd_resolved_llmnr: 'no'
 network_systemd_resolved_multicast_dns: 'no'
 network_systemd_resolved_cache: 'yes'
+network_systemd_resolved_stub: False
 network_systemd_resolved_global_dns: False
 network_systemd_resolved_debug: False
 
