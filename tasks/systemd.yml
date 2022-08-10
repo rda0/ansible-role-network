@@ -199,11 +199,10 @@
   notify: reload systemd
   when: network_systemd_networkd_wait_online_any
 
-- name: enable systemd-networkd-wait-online.service
+- name: "{{ network_systemd_networkd_wait_online | ternary('enable', 'disable') }} systemd-networkd-wait-online.service"
   systemd:
     name: systemd-networkd-wait-online
-    enabled: yes
-  when: network_systemd_networkd_wait_online_any
+    enabled: '{{ network_systemd_networkd_wait_online }}'
 
 - name: remove systemd-networkd-wait-online.service override
   file:
