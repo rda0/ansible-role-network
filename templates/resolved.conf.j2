@@ -9,5 +9,6 @@ DNS={{ network_systemd_dns_ipv4 }}
 {% if network_systemd_dns_ipv6 and 'ipv6' in globalvars[inventory_hostname] %}
 DNS={{ network_systemd_dns_ipv6 }}
 {% endif %}
+Domains={{ network_systemd_domains }}
 {% endif %}
 {{ network_systemd_resolved_conf }}
