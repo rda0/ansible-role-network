@@ -9,6 +9,7 @@ _network_ipv6_subnet: "{{ globalvars[inventory_hostname]['ipv6_subnet'] | defaul
 _network_ipv6_prefixlen: "{{ globalvars_subnets[_network_ipv6_subnet]['prefixlen'] | default('') }}"
 _network_ipv6_address: '{{ _network_ipv6_ip }}/{{ _network_ipv6_prefixlen }}'
 _network_ipv6_gateway: "{{ globalvars_subnets[_network_ipv6_subnet]['gateway_address'] | default('') }}"
+_network_ipv6_ra: "{% if not network_systemd_ipv6_accept_ra %}IPv6AcceptRA=false{% endif %}"
 
 network_systemd_host_address_params:
   - "Address={{ _network_ipv4_address }}"
@@ -16,6 +17,8 @@ network_systemd_host_address_params:
   - '{% if network_systemd_dns_ipv4 and not network_systemd_resolved_global_dns %}DNS={{ network_systemd_dns_ipv4 }}{% endif %}'
   - '{% if not network_systemd_resolved_global_dns %}Domains={{ network_systemd_domains }}{% endif %}'
   - "{% if _network_has_ipv6 %}Address={{ _network_ipv6_address }}{% endif %}"
+  - "{% if _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) %}Gateway={{ _network_ipv6_gateway }}{% endif %}"
+  - '{{ _network_ipv6_ra }}'
   - "{% if _network_has_ipv6 and network_systemd_dns_ipv6 and not network_systemd_resolved_global_dns %}DNS={{ network_systemd_dns_ipv6 }}{% endif %}"
 
 network_systemd_host_address_params_ad_dns:
@@ -24,6 +27,8 @@ network_systemd_host_address_params_ad_dns:
   - '{% if not network_systemd_resolved_global_dns %}DNS=129.132.80.31 129.132.80.26 129.132.80.45{% endif %}'
   - '{% if not network_systemd_resolved_global_dns %}Domains=ad.phys.ethz.ch phys.ethz.ch ethz.ch{% endif %}'
   - "{% if _network_has_ipv6 %}Address={{ _network_ipv6_address }}{% endif %}"
+  - "{% if _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) %}Gateway={{ _network_ipv6_gateway }}{% endif %}"
+  - '{{ _network_ipv6_ra }}'
 
 network_systemd_network_templates:
   default_dhcp:
@@ -32,9 +37,14 @@ network_systemd_network_templates:
       - name: Match
         params: ['Name={{ network_interface }}']
       - name: Network
-        params: ['DHCP=ipv4', 'Domains={{ network_systemd_domains }}']
+        params:
+          - 'DHCP=ipv4'
+          - 'Domains={{ network_systemd_domains }}'
+          - '{{ _network_ipv6_ra }}'
       - name: DHCP
-        params: ['UseDomains=true', 'UseNTP=true']
+        params:
+          - 'UseDomains=true'
+          - 'UseNTP=true'
   default_static:
     - name: host
       sections:
@@ -48,7 +58,9 @@ network_systemd_network_templates:
       - name: Match
         params: ['Name={{ network_interface }}']
       - name: Network
-        params: ["Bridge={{ network_bridges[0]['name'] | default('') }}"]
+        params:
+          - "Bridge={{ network_bridges[0]['name'] | default('') }}"
+          - '{{ _network_ipv6_ra }}'
     - name: "{{ network_bridges[0]['name'] | default('') }}"
       sections:
       - name: Match
@@ -61,13 +73,17 @@ network_systemd_network_templates:
       - name: Match
         params: ["Name={{ network_bond['interfaces'][0] | default('') }}"]
       - name: Network
-        params: ["Bond={{ network_bond['name'] | default('') }}"]
+        params:
+          - "Bond={{ network_bond['name'] | default('') }}"
+          - '{{ _network_ipv6_ra }}'
     - name: "{{ network_bond['interfaces'][1] | default('') }}"
       sections:
       - name: Match
         params: ["Name={{ network_bond['interfaces'][1] | default('') }}"]
       - name: Network
-        params: ["Bond={{ network_bond['name'] | default('') }}"]
+        params:
+          - "Bond={{ network_bond['name'] | default('') }}"
+          - '{{ _network_ipv6_ra }}'
     - name: "{{ network_bond['name'] | default('') }}"
       sections:
       - name: Match
@@ -86,13 +102,17 @@ network_systemd_network_templates:
       - name: Match
         params: ["Name={{ network_bond['interfaces'][0] | default('') }}"]
       - name: Network
-        params: ["Bond={{ network_bond['name'] | default('') }}"]
+        params:
+          - "Bond={{ network_bond['name'] | default('') }}"
+          - '{{ _network_ipv6_ra }}'
     - name: "{{ network_bond['interfaces'][1] | default('') }}"
       sections:
       - name: Match
         params: ["Name={{ network_bond['interfaces'][1] | default('') }}"]
       - name: Network
-        params: ["Bond={{ network_bond['name'] | default('') }}"]
+        params:
+          - "Bond={{ network_bond['name'] | default('') }}"
+          - '{{ _network_ipv6_ra }}'
     - name: "{{ network_bond['name'] | default('') }}"
       sections:
       - name: Match
@@ -102,18 +122,23 @@ network_systemd_network_templates:
           - "BindCarrier={{ network_bond['interfaces'][0] | default('') }} {{ network_bond['interfaces'][1] | default('') }}"
           - "VLAN={{ network_vlans['vlans'][0]['name'] | default('') }}"
           - "VLAN={{ network_vlans['vlans'][1]['name'] | default('') }}"
+          - '{{ _network_ipv6_ra }}'
     - name: "{{ network_vlans['vlans'][0]['name'] | default('') }}"
       sections:
       - name: Match
         params: ["Name={{ network_vlans['vlans'][0]['name'] | default('') }}"]
       - name: Network
-        params: ["Bridge={{ network_bridges[0]['name'] | default('') }}"]
+        params:
+          - "Bridge={{ network_bridges[0]['name'] | default('') }}"
+          - '{{ _network_ipv6_ra }}'
     - name: "{{ network_vlans['vlans'][1]['name'] | default('') }}"
       sections:
       - name: Match
         params: ["Name={{ network_vlans['vlans'][1]['name'] | default('') }}"]
       - name: Network
-        params: ["Bridge={{ network_bridges[1]['name'] | default('') }}"]
+        params:
+          - "Bridge={{ network_bridges[1]['name'] | default('') }}"
+          - '{{ _network_ipv6_ra }}'
     - name: "{{ network_bridges[0]['name'] | default('') }}"
       sections:
       - name: Match
