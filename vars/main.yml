@@ -1,19 +1,29 @@
+_network_ipv4_ip: "{{ globalvars[inventory_hostname]['ipv4'] }}"
+_network_ipv4_subnet: "{{ globalvars[inventory_hostname]['ipv4_subnet'] }}"
+_network_ipv4_prefixlen: "{{ globalvars_subnets[_network_ipv4_subnet]['prefixlen'] }}"
+_network_ipv4_address: '{{ _network_ipv4_ip }}/{{ _network_ipv4_prefixlen }}'
+_network_ipv4_gateway: "{{ globalvars_subnets[_network_ipv4_subnet]['gateway_address'] }}"
+_network_has_ipv6: "{{ True if 'ipv6' in globalvars[inventory_hostname] else False }}"
+_network_ipv6_ip: "{{ globalvars[inventory_hostname]['ipv6'] | default('') }}"
+_network_ipv6_subnet: "{{ globalvars[inventory_hostname]['ipv6_subnet'] | default('') }}"
+_network_ipv6_prefixlen: "{{ globalvars_subnets[_network_ipv6_subnet]['prefixlen'] | default('') }}"
+_network_ipv6_address: '{{ _network_ipv6_ip }}/{{ _network_ipv6_prefixlen }}'
+_network_ipv6_gateway: "{{ globalvars_subnets[_network_ipv6_subnet]['gateway_address'] | default('') }}"
+
 network_systemd_host_address_params:
-  - "Address={{ globalvars[inventory_hostname]['ipv4'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['prefixlen'] }}"
-  - "Gateway={{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['gateway_address'] }}"
+  - "Address={{ _network_ipv4_address }}"
+  - "Gateway={{ _network_ipv4_gateway }}"
   - '{% if network_systemd_dns_ipv4 and not network_systemd_resolved_global_dns %}DNS={{ network_systemd_dns_ipv4 }}{% endif %}'
   - '{% if not network_systemd_resolved_global_dns %}Domains={{ network_systemd_domains }}{% endif %}'
-  - "{% if 'ipv6' in globalvars[inventory_hostname] %}Address={{ globalvars[inventory_hostname]['ipv6'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv6_subnet']]['prefixlen'] }}{% endif %}"
-  - "{% if network_systemd_dns_ipv6 and not network_systemd_resolved_global_dns and 'ipv6' in globalvars[inventory_hostname] %}DNS={{ network_systemd_dns_ipv6 }}{% endif %}"
+  - "{% if _network_has_ipv6 %}Address={{ _network_ipv6_address }}{% endif %}"
+  - "{% if _network_has_ipv6 and network_systemd_dns_ipv6 and not network_systemd_resolved_global_dns %}DNS={{ network_systemd_dns_ipv6 }}{% endif %}"
 
 network_systemd_host_address_params_ad_dns:
-  - "Address={{ globalvars[inventory_hostname]['ipv4'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['prefixlen'] }}"
-  - "Gateway={{ globalvars_subnets[globalvars[inventory_hostname]['ipv4_subnet']]['gateway_address'] }}"
-  - '{% if not network_systemd_resolved_global_dns %}DNS=129.132.80.31{% endif %}'
-  - '{% if not network_systemd_resolved_global_dns %}DNS=129.132.80.26{% endif %}'
-  - '{% if not network_systemd_resolved_global_dns %}DNS=129.132.80.45{% endif %}'
+  - "Address={{ _network_ipv4_address }}"
+  - "Gateway={{ _network_ipv4_gateway }}"
+  - '{% if not network_systemd_resolved_global_dns %}DNS=129.132.80.31 129.132.80.26 129.132.80.45{% endif %}'
   - '{% if not network_systemd_resolved_global_dns %}Domains=ad.phys.ethz.ch phys.ethz.ch ethz.ch{% endif %}'
-  - "{% if 'ipv6' in globalvars[inventory_hostname] %}Address={{ globalvars[inventory_hostname]['ipv6'] }}/{{ globalvars_subnets[globalvars[inventory_hostname]['ipv6_subnet']]['prefixlen'] }}{% endif %}"
+  - "{% if _network_has_ipv6 %}Address={{ _network_ipv6_address }}{% endif %}"
 
 network_systemd_network_templates:
   default_dhcp:
