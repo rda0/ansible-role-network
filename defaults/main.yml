@@ -34,8 +34,8 @@ network_systemd_etc_network_interfaces_d_remove: '{{ network_systemd_clean_insta
 network_systemd_remove_network_manager: '{{ network_systemd_clean_install }}'
 network_systemd_remove_netplan: '{{ network_systemd_clean_install }}'
 network_systemd_remove_dhcpcd: '{{ network_systemd_clean_install }}'
-network_systemd_ipv6_accept_ra: True
-network_systemd_ipv6_static_gateway: False
+network_systemd_ipv6_accept_ra: False
+network_systemd_ipv6_static_gateway: True
 network_systemd_networkd_wait_online: True
 network_systemd_networkd_wait_online_any: False
 network_systemd_resolved_conf: ''
