@@ -42,6 +42,7 @@ network_systemd_resolved_conf: ''
 network_systemd_resolved_libnss: True
 network_systemd_resolved_llmnr: 'no'
 network_systemd_resolved_multicast_dns: 'no'
+network_systemd_resolved_dnssec: 'no'
 network_systemd_resolved_cache: 'yes'
 network_systemd_resolved_stub: False
 network_systemd_resolved_global_dns: "{{ False if 'dhcp' in network_systemd_template else True }}"
