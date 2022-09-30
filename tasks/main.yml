@@ -1,4 +1,6 @@
 - name: tags-block
+  tags: network
+  when: role_network
   block:
 
   - import_tasks: systemd.yml
@@ -8,6 +10,3 @@
   - import_tasks: kernel_settings.yml
     tags: network_kernel_settings
     when: import_network_kernel_settings
-
-  tags: network
-  when: role_network

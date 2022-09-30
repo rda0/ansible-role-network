@@ -1,4 +1,5 @@
 - name: remove network manager
+  when: network_systemd_remove_network_manager
   block:
   - name: disable service NetworkManager
     service:
@@ -12,9 +13,9 @@
       state: absent
     ignore_errors: True  # noqa ignore-errors
     failed_when: False
-  when: network_systemd_remove_network_manager
 
 - name: remove netplan
+  when: network_systemd_remove_netplan
   block:
   - name: remove packages for netplan
     package:
@@ -24,7 +25,6 @@
     file:
       path: /etc/netplan
       state: absent
-  when: network_systemd_remove_netplan
 
 - name: remove packages for dhcpcd
   package:
