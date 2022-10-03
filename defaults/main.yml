@@ -57,13 +57,14 @@ _network_has_bridge_and_management_interface: "{{ True if _network_has_bridge an
 # assuming both bridge and management interface are on the same layer 2 subnet (vlan)
 network_multiple_interfaces_on_same_subnet: "{{ True if _network_has_bridge_and_management_interface else False }}"
 network_ipv4_ip_forward: False
+network_netfilter_nf_conntrack_max: '65536'
 network_kernel_settings_filename: "91-net.conf"
 network_kernel_settings_file: "/etc/sysctl.d/{{ network_kernel_settings_filename }}"
 # List of kernel settings to configure via sysctl
 # - value: the desired value
 # - default: the kernel's default value
 # Will only be modified/configured if value is not equal to default
-network_kernel_settings:
+_network_kernel_settings:
   - name: net.ipv4.conf.all.arp_ignore
     value: "{{ '1' if network_multiple_interfaces_on_same_subnet else '0' }}"
     default: '0'
@@ -73,3 +74,6 @@ network_kernel_settings:
   - name: net.ipv4.ip_forward
     value: "{{ '1' if network_ipv4_ip_forward else '0' }}"
     default: '0'
+  - name: net.netfilter.nf_conntrack_max
+    value: "{{ network_netfilter_nf_conntrack_max }}"
+    default: '65536'

@@ -6,4 +6,4 @@
     state: "{{ 'present' if item.value != item.default else 'absent' }}"
     sysctl_set: "{{ True if item.value != item.default else False }}"
     reload: no
-  loop: '{{ network_kernel_settings }}'
+  loop: '{{ _network_kernel_settings }}'

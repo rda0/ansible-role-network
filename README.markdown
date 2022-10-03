@@ -148,3 +148,7 @@ See also:
 ### network_ipv4_ip_forward
 
 Set to `True` to enable IPv4 forwarding to configure the host as a router. This may also be set dynamically by software like libvirt or other hypervisors (container, vms) when needed.
+
+### network_netfilter_nf_conntrack_max
+
+Increase this if the conntrack table is getting full, otherwise connections may get dropped.
