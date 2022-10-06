@@ -38,6 +38,14 @@
   failed_when: False
   when: network_systemd_remove_dhcpcd
 
+- name: remove networkd-dispatcher
+  package:
+    pkg: networkd-dispatcher
+    state: absent
+  ignore_errors: True  # noqa ignore-errors
+  failed_when: False
+  when: network_systemd_remove_networkd_dispatcher
+
 - name: remove /etc/systemd/network/99-default.link
   file:
     path: /etc/systemd/network/99-default.link
