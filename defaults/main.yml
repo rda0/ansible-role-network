@@ -1,4 +1,4 @@
-role_network: False
+role_network: True
 import_network_systemd: True
 import_network_kernel_settings: True
 
