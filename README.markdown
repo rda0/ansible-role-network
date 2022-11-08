@@ -127,7 +127,7 @@ For details see `defaults/main.yml`.
 
 ### interface naming
 
-Link files may be generated to override the default naming scheme for interface names.
+Link files may be generated to override the default naming for interfaces.
 Use the variable `network_systemd_link` to generate link files for custom interface naming.
 Any changes to link files will update the initramfs and require a system reboot.
 Use this feature with care!
@@ -139,11 +139,32 @@ network_systemd_link:
   - name: 'enfoo'
     sections:
     - name: Match
-      params: ['MACAddress=d8:5e:d3:64:e4:4e']
+      params: ['MACAddress=aa:bb:cc:00:11:22']
     - name: Link
       params:
         - 'Name=enfoo'
 ```
+
+Use the variable `network_systemd_link_templates` to select from templates and `network_systemd_link_local`
+to override (append) them. Currently only templates for overriding the default naming policy defined in
+`/usr/lib/systemd/network/99-default.link` are available.
+
+Example config to use `enp` (path) names by default:
+
+```yaml
+network_systemd_link_template: name_policy
+network_systemd_link_name_policy: path
+network_systemd_link_local:
+  - name: 'enfoo'
+    sections:
+    - name: Match
+      params: ['MACAddress=aa:bb:cc:00:11:22']
+    - name: Link
+      params:
+        - 'Name=enfoo'
+```
+
+See the notes section at the end of the readme for docs and quirks in interface naming.
 
 kernel settings
 ---------------
@@ -172,3 +193,43 @@ Set to `True` to enable IPv4 forwarding to configure the host as a router. This 
 ### network_netfilter_nf_conntrack_max
 
 Increase this if the conntrack table is getting full, otherwise connections may get dropped.
+
+
+notes
+-----
+
+### interface naming
+
+Since "predictable interface names" are used, iterface names are pretty unpredictable. Beware of:
+
+- Kernel updates
+- Systemd updates
+- Udev updates
+- Hardware modifications
+
+Some network hardware needs overriding of the default naming scheme to work properly due to broken firmware,
+which might use the same `onboard` or `slot` number for mutliple interfaces. See:
+
+- https://github.com/systemd/systemd/issues/24102
+- https://github.com/systemd/systemd/issues/13788
+
+Many legacy "predictable interface naming" stuff was used in the past.
+One example is `/etc/udev/rules.d/70-persistent-net.rules` (udev) introduced somewhere around Debian 5 Lenny,
+which no longer works as of Debian 11 Bullseye.
+
+Some useful debugging commands:
+
+```sh
+SYSTEMD_LOG_LEVEL=debug udevadm test-builtin net_id /sys/class/net/<ifname>
+SYSTEMD_LOG_LEVEL=debug udevadm test /sys/class/net/<ifname>
+```
+
+Docs:
+
+- https://wiki.debian.org/NetworkInterfaceNames
+- https://www.freedesktop.org/software/systemd/man/systemd.link.html
+- https://www.freedesktop.org/software/systemd/man/systemd.net-naming-scheme.html
+- https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/
+- https://lwn.net/Articles/794289/ net: introduce alternative names for network interfaces
+- https://wiki.archlinux.org/title/Network_configuration#Change_interface_name
+- https://wiki.archlinux.org/title/udev

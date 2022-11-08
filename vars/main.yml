@@ -222,3 +222,26 @@ network_systemd_netdev_templates:
           - 'Kind=bridge'
       - name: Bridge
         params: ['STP=off']
+
+network_systemd_link_templates:
+  default: []
+  name_policy:
+    - name: '90-name-policy'
+      sections:
+      - name: Match
+        params: ['OriginalName=*']
+      - name: Link
+        params:
+          - 'NamePolicy={{ network_systemd_link_name_policy }}'
+          - 'AlternativeNamesPolicy={{ network_systemd_link_alternative_name_policy }}'
+          - 'MACAddressPolicy=persistent'
+  name_policy_ethernet:
+    - name: '90-name-policy-ethernet'
+      sections:
+      - name: Match
+        params: ['Type=ether']
+      - name: Link
+        params:
+          - 'NamePolicy={{ network_systemd_link_name_policy }}'
+          - 'AlternativeNamesPolicy={{ network_systemd_link_alternative_name_policy }}'
+          - 'MACAddressPolicy=persistent'

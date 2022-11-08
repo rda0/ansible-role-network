@@ -28,7 +28,6 @@ network_systemd_network_local: []
 network_systemd_netdev_local: []
 network_systemd_network: '{{ network_systemd_network_templates[network_systemd_template] + network_systemd_network_local }}'
 network_systemd_netdev: '{{ network_systemd_netdev_templates[network_systemd_template] + network_systemd_netdev_local }}'
-network_systemd_link: []
 network_systemd_unit_networking_disable: '{{ network_systemd_clean_install }}'
 network_systemd_etc_network_interfaces_truncate: '{{ network_systemd_clean_install }}'
 network_systemd_etc_network_interfaces_d_remove: '{{ network_systemd_clean_install }}'
@@ -49,6 +48,11 @@ network_systemd_resolved_cache: 'yes'
 network_systemd_resolved_stub: False
 network_systemd_resolved_global_dns: "{{ False if 'dhcp' in network_systemd_template else True }}"
 network_systemd_resolved_debug: False
+network_systemd_link_template: default
+network_systemd_link_local: []
+network_systemd_link: '{{ network_systemd_link_templates[network_systemd_link_template] + network_systemd_link_local }}'
+network_systemd_link_name_policy: keep kernel database onboard slot path
+network_systemd_link_alternative_name_policy: database onboard slot path
 
 # Automatically detect when template contains a bridge
 _network_has_bridge: "{{ True if 'bridge' in network_systemd_template else False }}"
