@@ -91,6 +91,19 @@
   notify: restart systemd-networkd
   loop: "{{ network_systemd_netdev | rejectattr('name', 'equalto', '') | list }}"
 
+- name: deploy links
+  template:
+    src: systemd.j2
+    dest: '/etc/systemd/network/{{ item.name }}.link'
+    owner: root
+    group: root
+    mode: 0644
+  vars:
+    name: '{{ item.name }}'
+    sections: '{{ item.sections }}'
+  notify: update initramfs
+  loop: "{{ network_systemd_link | rejectattr('name', 'equalto', '') | list }}"
+
 - name: deploy /etc/systemd/resolved.conf
   template:
     src: resolved.conf.j2

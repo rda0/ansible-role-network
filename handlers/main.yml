@@ -2,3 +2,7 @@
   service:
     name: systemd-resolved
     state: restarted
+
+- name: update initramfs
+  command:
+    cmd: /usr/sbin/update-initramfs -u

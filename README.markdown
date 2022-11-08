@@ -125,6 +125,26 @@ For details see `defaults/main.yml`.
 - `network_systemd_clean_install`: By default the role will perform a clean install, removing/disabling any other known default Debian/Ubuntu network configuration
 - `network_systemd_wipe`: Should only manually be set to `True` via command line parameter (`-e network_systemd_wipe=True`), when `/etc/systemd/network` is expected to have existing configration files not needed anymore or when `.network` or `.netdev` file names change
 
+### interface naming
+
+Link files may be generated to override the default naming scheme for interface names.
+Use the variable `network_systemd_link` to generate link files for custom interface naming.
+Any changes to link files will update the initramfs and require a system reboot.
+Use this feature with care!
+
+The syntax is as follows:
+
+```yaml
+network_systemd_link:
+  - name: 'enfoo'
+    sections:
+    - name: Match
+      params: ['MACAddress=d8:5e:d3:64:e4:4e']
+    - name: Link
+      params:
+        - 'Name=enfoo'
+```
+
 kernel settings
 ---------------
 
