@@ -59,7 +59,7 @@ _network_has_bridge_and_management_interface: "{{ True if _network_has_bridge an
 # assuming both bridge and management interface are on the same layer 2 subnet (vlan)
 network_multiple_interfaces_on_same_subnet: "{{ True if _network_has_bridge_and_management_interface else False }}"
 network_ipv4_ip_forward: False
-network_ipv4_ip_mtu_probing: 0
+network_ipv4_ip_mtu_probing: '0'
 network_netfilter_nf_conntrack_max: '65536'
 network_kernel_settings_filename: "91-net.conf"
 network_kernel_settings_file: "/etc/sysctl.d/{{ network_kernel_settings_filename }}"
