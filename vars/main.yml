@@ -21,15 +21,6 @@ network_systemd_host_address_params:
   - '{{ _network_ipv6_ra }}'
   - "{% if _network_has_ipv6 and network_systemd_dns_ipv6 and not network_systemd_resolved_global_dns %}DNS={{ network_systemd_dns_ipv6 }}{% endif %}"
 
-network_systemd_host_address_params_ad_dns:
-  - "Address={{ _network_ipv4_address }}"
-  - "Gateway={{ _network_ipv4_gateway }}"
-  - '{% if not network_systemd_resolved_global_dns %}DNS=129.132.80.31 129.132.80.26 129.132.80.45{% endif %}'
-  - '{% if not network_systemd_resolved_global_dns %}Domains=ad.phys.ethz.ch phys.ethz.ch ethz.ch{% endif %}'
-  - "{% if _network_has_ipv6 %}Address={{ _network_ipv6_address }}{% endif %}"
-  - "{% if _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) %}Gateway={{ _network_ipv6_gateway }}{% endif %}"
-  - '{{ _network_ipv6_ra }}'
-
 network_systemd_network_templates:
   default_dhcp:
     - name: host
