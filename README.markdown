@@ -42,7 +42,7 @@ network_systemd_network:
         - 'UseNTP=true'
 ```
 
-Hosts configured as such with mutliple interfaces need the following setting to speed up the boot process:
+Hosts configured as such with multiple interfaces need the following setting to speed up the boot process:
 
 ```yaml
 network_systemd_networkd_wait_online_any: True
@@ -200,7 +200,7 @@ notes
 
 ### interface naming
 
-Since "predictable interface names" are used, iterface names are pretty unpredictable. Beware of:
+Since "predictable interface names" are used, interface names are pretty unpredictable. Beware of:
 
 - Kernel updates
 - Systemd updates
@@ -208,7 +208,7 @@ Since "predictable interface names" are used, iterface names are pretty unpredic
 - Hardware modifications
 
 Some network hardware needs overriding of the default naming scheme to work properly due to broken firmware,
-which might use the same `onboard` or `slot` number for mutliple interfaces. See:
+which might use the same `onboard` or `slot` number for multiple interfaces. See:
 
 - https://github.com/systemd/systemd/issues/24102
 - https://github.com/systemd/systemd/issues/13788
