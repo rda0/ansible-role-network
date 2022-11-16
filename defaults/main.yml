@@ -1,6 +1,7 @@
 role_network: True
 import_network_systemd: True
 import_network_kernel_settings: True
+import_network_kernel_modules: True   # only active if network_kernel_module_sets is non-empty
 
 #network_interface: en*
 network_bond: {}
@@ -87,3 +88,19 @@ _network_kernel_settings:
   - name: net.ipv4.tcp_mtu_probing
     value: "{{ network_ipv4_ip_mtu_probing }}"
     default: '0'
+
+
+# Define which module sets (see below) should be loaded at boot
+network_kernel_module_sets: []
+
+# Define sets of modules
+#  - name: name of the set of modules
+#  - modules: a list of the modules
+_network_kernel_module_sets:
+  - name: infiniband
+    modules:
+      - mlx4_ib   # mellanox driver
+      - ib_ipoib  # IP over infiniband
+      - rdma_ucm  # iSER
+      - ib_uverbs # userspace verb access
+      - ib_umad   # userspace management datagrams

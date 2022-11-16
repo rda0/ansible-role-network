@@ -1,0 +1,18 @@
+- name: register kernel modules for load at boot
+  blockinfile:
+    dest: /etc/modules
+    # {name: foo, modules: [ bar, baz ]} -> [[ bar, baz ]] -> [ bar, baz ] -> "bar\n\baz"
+    block: "{{ _network_kernel_module_sets | selectattr('name','==', module_set_name) | map(attribute='modules') | flatten | join('\n') }}"
+  loop:
+    "{{ network_kernel_module_sets }}"
+  loop_control:
+    loop_var: module_set_name
+
+- name: load kernel modules
+  community.general.modprobe:
+    name: "{{ module_name }}"
+  loop:
+    # {name: foo, modules: [ bar, baz ]} -> [[ bar, baz ]] -> [ bar, baz ]
+    "{{ _network_kernel_module_sets | selectattr('name', 'in', network_kernel_module_sets) | map(attribute='modules') | flatten }}"
+  loop_control:
+    loop_var: module_name
