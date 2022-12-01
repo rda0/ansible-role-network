@@ -1,5 +1,5 @@
 - name: apply sysctl kernel settings
-  sysctl:
+  ansible.posix.sysctl:
     sysctl_file: '{{ network_kernel_settings_file }}'
     name: '{{ item.name }}'
     value: '{{ item.value }}'
