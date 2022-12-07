@@ -77,6 +77,8 @@
     sections: '{{ item.sections }}'
   notify: restart systemd-networkd
   loop: "{{ network_systemd_network | rejectattr('name', 'equalto', '') | list }}"
+  loop_control:
+    label: "{{ item.name }}"
 
 - name: deploy netdevs
   template:
@@ -90,6 +92,8 @@
     sections: '{{ item.sections }}'
   notify: restart systemd-networkd
   loop: "{{ network_systemd_netdev | rejectattr('name', 'equalto', '') | list }}"
+  loop_control:
+    label: "{{ item.name }}"
 
 - name: deploy links
   template:
@@ -103,6 +107,8 @@
     sections: '{{ item.sections }}'
   notify: update initramfs
   loop: "{{ network_systemd_link | rejectattr('name', 'equalto', '') | list }}"
+  loop_control:
+    label: "{{ item.name }}"
 
 - name: deploy /etc/systemd/resolved.conf
   template:
