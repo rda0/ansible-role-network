@@ -123,7 +123,7 @@ network_bridges:
 For details see `defaults/main.yml`.
 
 - `network_systemd_clean_install`: By default the role will perform a clean install, removing/disabling any other known default Debian/Ubuntu network configuration
-- `network_systemd_wipe`: Should only manually be set to `True` via command line parameter (`-e network_systemd_wipe=True`), when `/etc/systemd/network` is expected to have existing configration files not needed anymore or when `.network` or `.netdev` file names change
+- `network_systemd_wipe`: Should only manually be set to `True` via command line parameter (`-e '{"network_systemd_wipe": True}'`), when `/etc/systemd/network` is expected to have existing configration files not needed anymore or when `.network` or `.netdev` file names change
 
 ### interface naming
 
