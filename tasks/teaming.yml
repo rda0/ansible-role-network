@@ -1,0 +1,19 @@
+- name: install teaming utils
+  package:
+    pkg:
+      - libteam-utils
+      - ethtool
+  when: network_teams
+
+- name: inlcude wipe teaming tasks
+  include_tasks: teaming_wipe.yml
+  when: network_systemd_wipe_teaming
+
+- name: import tasks for teaming config
+  include_tasks: teaming_config.yml
+  loop:
+    "{{ [network_teams] | flatten }}"
+    # this way network_teams can be simple dict, or a list of dicts
+  loop_control:
+    loop_var: network_team    # when: network_teams is implicit
+    label: "{{ network_team.name }}"

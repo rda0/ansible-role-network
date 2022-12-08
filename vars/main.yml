@@ -142,6 +142,50 @@ network_systemd_network_templates:
         params: ["Name={{ network_bridges[1]['name'] | default('') }}"]
       - name: Network
         params: ['IPv6AcceptRA=false']
+  team_2vlans_2bridges:
+    - name: "{{ '' if network_interface in network_bridges | map(attribute='name') | flatten else 'host' }}"
+      sections:
+      - name: Match
+        params: ['Name={{ network_interface }}']
+      - name: Network
+        params: '{{ network_systemd_host_address_params }}'
+    - name: "{{ network_teams['name'] | default('') }}"
+      sections:
+      - name: Match
+        params: ["Name={{ network_teams['name'] | default('') }}"]
+      - name: Network
+        params:
+          - "VLAN={{ network_vlans['vlans'][0]['name'] | default('') }}"
+          - "VLAN={{ network_vlans['vlans'][1]['name'] | default('') }}"
+          - '{{ _network_ipv6_ra }}'
+    - name: "{{ network_vlans['vlans'][0]['name'] | default('') }}"
+      sections:
+      - name: Match
+        params: ["Name={{ network_vlans['vlans'][0]['name'] | default('') }}"]
+      - name: Network
+        params:
+          - "Bridge={{ network_bridges[0]['name'] | default('') }}"
+          - '{{ _network_ipv6_ra }}'
+    - name: "{{ network_vlans['vlans'][1]['name'] | default('') }}"
+      sections:
+      - name: Match
+        params: ["Name={{ network_vlans['vlans'][1]['name'] | default('') }}"]
+      - name: Network
+        params:
+          - "Bridge={{ network_bridges[1]['name'] | default('') }}"
+          - '{{ _network_ipv6_ra }}'
+    - name: "{{ network_bridges[0]['name'] | default('') }}"
+      sections:
+      - name: Match
+        params: ["Name={{ network_bridges[0]['name'] | default('') }}"]
+      - name: Network
+        params: "{{ network_systemd_host_address_params if network_interface in network_bridges | map(attribute='name') | flatten else ['IPv6AcceptRA=false'] }}"
+    - name: "{{ network_bridges[1]['name'] | default('') }}"
+      sections:
+      - name: Match
+        params: ["Name={{ network_bridges[1]['name'] | default('') }}"]
+      - name: Network
+        params: ['IPv6AcceptRA=false']
 
 network_systemd_netdev_templates:
   default_dhcp: []
@@ -181,6 +225,39 @@ network_systemd_netdev_templates:
           - 'TransmitHashPolicy=layer3+4'
           - 'MIIMonitorSec=1s'
           - 'LACPTransmitRate=fast'
+    - name: "{{ network_vlans['vlans'][0]['name'] | default('') }}"
+      sections:
+      - name: NetDev
+        params:
+          - "Name={{ network_vlans['vlans'][0]['name'] | default('') }}"
+          - 'Kind=vlan'
+      - name: VLAN
+        params: ["Id={{ network_vlans['vlans'][0]['id'] | default('') }}"]
+    - name: "{{ network_vlans['vlans'][1]['name'] | default('') }}"
+      sections:
+      - name: NetDev
+        params:
+          - "Name={{ network_vlans['vlans'][1]['name'] | default('') }}"
+          - 'Kind=vlan'
+      - name: VLAN
+        params: ["Id={{ network_vlans['vlans'][1]['id'] | default('') }}"]
+    - name: "{{ network_bridges[0]['name'] | default('') }}"
+      sections:
+      - name: NetDev
+        params:
+          - "Name={{ network_bridges[0]['name'] | default('') }}"
+          - 'Kind=bridge'
+      - name: Bridge
+        params: ['STP=off']
+    - name: "{{ network_bridges[1]['name'] | default('') }}"
+      sections:
+      - name: NetDev
+        params:
+          - "Name={{ network_bridges[1]['name'] | default('') }}"
+          - 'Kind=bridge'
+      - name: Bridge
+        params: ['STP=off']
+  team_2vlans_2bridges:
     - name: "{{ network_vlans['vlans'][0]['name'] | default('') }}"
       sections:
       - name: NetDev

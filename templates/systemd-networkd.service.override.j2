@@ -1,0 +1,5 @@
+[Unit]
+# Restart systemd-networkd if teamd.service is restarted
+PartOf={{ _network_team_service }}.service
+# But restart it after teamd, not before
+After={{ _network_team_service }}.service

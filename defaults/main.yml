@@ -2,11 +2,13 @@ role_network: True
 import_network_systemd: True
 import_network_kernel_settings: True
 import_network_kernel_modules: True   # only active if network_kernel_module_sets is non-empty
+import_network_teaming: True    # only active if network_teams is non-empty
 
 #network_interface: en*
 network_bond: {}
 network_vlans: {}
 network_bridges: []
+network_teams: []
 
 network_systemd_domains: phys.ethz.ch ethz.ch
 # Due to a limitation in linux (`man resolv.conf`) and some network utilities (like `host`),
@@ -23,6 +25,7 @@ network_systemd_dns_ipv6: 2001:67c:10ec::c
 
 network_systemd_restart: True
 network_systemd_wipe: False
+network_systemd_wipe_teaming: False
 network_systemd_clean_install: True
 network_systemd_template: default_dhcp
 network_systemd_network_local: []
@@ -99,8 +102,22 @@ network_kernel_module_sets: []
 _network_kernel_module_sets:
   - name: infiniband
     modules:
-      - mlx4_ib   # mellanox driver
-      - ib_ipoib  # IP over infiniband
-      - rdma_ucm  # iSER
-      - ib_uverbs # userspace verb access
-      - ib_umad   # userspace management datagrams
+      - mlx4_ib     # mellanox driver
+      - ib_ipoib    # IP over infiniband
+      - rdma_ucm    # iSER
+      - ib_uverbs   # userspace verb access
+      - ib_umad     # userspace management datagrams
+
+_network_restart_team_service: []
+_network_team_defaults:
+  runner:
+    name: "lacp"                    # Use 802.3ad LACP
+    active: True
+    fast_rate: True                 # query LACPDU packets every 1s, instead of every 30s
+    tx_hash: ["l3", "l4"]           # use l3 (src/dst ip4, ip6) and l4 (src/dst TCP, UDP, SCTP ports)
+    agg_select_policy: "bandwidth"  # aggregator with highest total bandwidth, not sure what about "aggregator" in this context
+    tx_balancer:
+      name: "basic"                 # use active TX balancing
+  link_watch:
+    name: "ethtool"                 # use ethtool to detect dead/alive link
+  ports: {}                         # teamed interfaces, will be filled dynamically

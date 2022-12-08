@@ -1,0 +1,1 @@
+{{ _network_team_defaults | combine({'device': network_team.name}) | combine( {'ports': _network_team_ports }) | to_nice_json }}

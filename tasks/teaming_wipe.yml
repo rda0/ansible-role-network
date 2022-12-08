@@ -1,0 +1,40 @@
+- name: remove /etc/teamd
+  file:
+    path: /etc/teamd
+    state: absent
+
+- name: select systemd-networkd overrides for deletion
+  find:
+    paths: /etc/systemd/system/systemd-networkd.service.d/
+    file_type: file
+    use_regex: yes
+    patterns: ['^teamd-.*.conf$']
+  register: _network_find_systemd_networkd_overrides
+
+- name: select teamd service files for deletion
+  find:
+    paths: /etc/systemd/system/
+    file_type: file
+    use_regex: yes
+    patterns: ['^teamd-.*.service$']
+  register: _network_find_systemd_teamd_services
+
+- name: delete systemd-networkd overrides
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop:
+    "{{ _network_find_systemd_networkd_overrides.files }}"
+  register: _network_wipe_systemd_networkd_overrides
+
+- name: delete systemd service files
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop:
+    "{{ _network_find_systemd_teamd_services.files }}"
+  register: _network_wipe_systemd_teamd_services
+
+- name: reload systemd daemon
+  systemd:
+    daemon_reload: yes

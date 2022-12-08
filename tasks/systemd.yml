@@ -241,3 +241,11 @@
     state: absent
   notify: reload systemd
   when: not network_systemd_networkd_wait_online_any
+
+# we might be offline after this, it needs a properly configured network and
+# a restart of systemd-networkd (auotmatic via dependencies) to bring us back online.
+- name: restart teamd
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+  loop: "{{ _network_restart_team_service }}"
