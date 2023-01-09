@@ -127,7 +127,7 @@
 - name: create systemd-resolved.service.d
   file:
     path: /etc/systemd/system/systemd-resolved.service.d
-    state: "{{ network_systemd_resolved_debug | ternary('directory', 'absent') }}"
+    state: "{{ network_systemd_resolved_debug | ternary('directory', 'absent') }}"  # noqa args[module]
     owner: root
     group: root
     mode: 0755
