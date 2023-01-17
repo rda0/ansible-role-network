@@ -5,4 +5,4 @@
 
 - name: update initramfs
   command:
-    cmd: /usr/sbin/update-initramfs -u
+    cmd: /usr/sbin/update-initramfs -u -k all
