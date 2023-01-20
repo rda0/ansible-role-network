@@ -43,6 +43,7 @@ network_systemd_ipv6_accept_ra: False
 network_systemd_ipv6_static_gateway: True
 network_systemd_networkd_wait_online: True
 network_systemd_networkd_wait_online_any: False
+network_systemd_networkd_wait_online_interfaces: []
 network_systemd_resolved_conf: ''
 network_systemd_resolved_libnss: True
 network_systemd_resolved_llmnr: 'no'

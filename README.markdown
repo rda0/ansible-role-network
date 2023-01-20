@@ -42,11 +42,12 @@ network_systemd_network:
         - 'UseNTP=true'
 ```
 
-Hosts configured as such with multiple interfaces need the following setting to speed up the boot process:
+Hosts configured as such with multiple interfaces may want to configure the wait-online service:
 
-```yaml
-network_systemd_networkd_wait_online_any: True
-```
+- the default is to wait until all configures interfaces are up. Disable this with `network_systemd_networkd_wait_online: False`
+- set `network_systemd_networkd_wait_online_interfaces: ['eno1', 'eno2' ]` to wait only for `eno1` _and_ `eno2`
+- set `network_systemd_networkd_wait_online_any: True` to wait until _any_ interface is up, if `network_systemd_networkd_wait_online_interfaces` is non-empty, wait until _any of those_ interface is up
+- see systemd-networkd-wait-online.service(8) for more information
 
 Another example to configure an interface in addition to preset interfaces:
 
