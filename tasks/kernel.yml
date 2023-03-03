@@ -17,12 +17,16 @@
   loop_control:
     loop_var: module_name
 
+- name: set fact _network_kernel_settings
+  set_fact:
+    _network_kernel_settings: '{{ network_kernel_settings_defaults | combine(network_kernel_settings_group, recursive=True) | combine(network_kernel_settings, recursive=True) }}'
+
 - name: apply sysctl kernel settings
   ansible.posix.sysctl:
     sysctl_file: '{{ network_kernel_settings_file }}'
-    name: '{{ item.name }}'
-    value: '{{ item.value }}'
-    state: "{{ 'present' if item.value != item.default else 'absent' }}"
-    sysctl_set: "{{ True if item.value != item.default else False }}"
+    name: '{{ item.value.name | default(item.key) }}'
+    value: '{{ item.value.value }}'
+    state: "{{ 'present' if item.value.value != item.value.default | default(None) else 'absent' }}"
+    sysctl_set: "{{ True if item.value.value != item.value.default | default(None) else False }}"
     reload: no
-  loop: '{{ _network_kernel_settings }}'
+  loop: '{{ _network_kernel_settings | dict2items }}'

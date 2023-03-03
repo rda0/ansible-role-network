@@ -71,26 +71,42 @@ network_ipv4_ip_mtu_probing: '0'
 network_netfilter_nf_conntrack_max: '65536'
 network_kernel_settings_filename: "91-net.conf"
 network_kernel_settings_file: "/etc/sysctl.d/{{ network_kernel_settings_filename }}"
-# List of kernel settings to configure via sysctl
-# - value: the desired value
-# - default: the kernel's default value
+
+# Kernel settings to configure via sysctl
+# <kernel_setting_variable>:
+#   <kernel_setting_name>:
+#     name: kernel setting name (optional, default is to use the dict key)
+#     value: the desired value
+#     default: the kernel's default value (optional for settings with no default -> `null`)
 # Will only be modified/configured if value is not equal to default
-_network_kernel_settings:
-  - name: net.ipv4.conf.all.arp_ignore
+# Do not set default for kernel settings with no static defined default (or use `null`)
+
+# Internal variables
+_network_kernel_settings: {}
+
+# Variable for definition of kernel settings default values, static kernel default must be set here
+network_kernel_settings_defaults:
+  net.ipv4.conf.all.arp_ignore:
     value: "{{ '1' if network_multiple_interfaces_on_same_subnet else '0' }}"
     default: '0'
-  - name: net.ipv4.conf.default.arp_filter
+  net.ipv4.conf.default.arp_filter:
     value: "{{ '1' if network_multiple_interfaces_on_same_subnet else '0' }}"
     default: '0'
-  - name: net.ipv4.ip_forward
+  net.ipv4.ip_forward:
     value: "{{ '1' if network_ipv4_ip_forward else '0' }}"
     default: '0'
-  - name: net.netfilter.nf_conntrack_max
+  net.netfilter.nf_conntrack_max:
     value: "{{ network_netfilter_nf_conntrack_max }}"
     default: '65536'
-  - name: net.ipv4.tcp_mtu_probing
+  net.ipv4.tcp_mtu_probing:
     value: "{{ network_ipv4_ip_mtu_probing }}"
     default: '0'
+
+# Override settings for use in group_vars
+network_kernel_settings_group: {}
+
+# Override settings for use in host_vars
+network_kernel_settings: {}
 
 
 # Define which module sets (see below) should be loaded at boot
