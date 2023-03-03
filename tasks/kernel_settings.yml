@@ -1,9 +1,0 @@
-- name: apply sysctl kernel settings
-  ansible.posix.sysctl:
-    sysctl_file: '{{ network_kernel_settings_file }}'
-    name: '{{ item.name }}'
-    value: '{{ item.value }}'
-    state: "{{ 'present' if item.value != item.default else 'absent' }}"
-    sysctl_set: "{{ True if item.value != item.default else False }}"
-    reload: no
-  loop: '{{ _network_kernel_settings }}'

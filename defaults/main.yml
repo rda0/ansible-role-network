@@ -1,7 +1,6 @@
 role_network: True
+import_network_kernel: True
 import_network_systemd: True
-import_network_kernel_settings: True
-import_network_kernel_modules: True   # only active if network_kernel_module_sets is non-empty
 import_network_teaming: True    # only active if network_teams is non-empty
 
 #network_interface: en*

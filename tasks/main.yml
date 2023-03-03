@@ -3,10 +3,10 @@
   when: role_network
   block:
 
-    - name: import tasks from kernel_modules.yml
-      import_tasks: kernel_modules.yml
-      tags: network_kernel_modules
-      when: import_network_kernel_modules
+    - name: import tasks from kernel.yml
+      import_tasks: kernel.yml
+      tags: network_kernel
+      when: import_network_kernel
 
     - name: import tasks teaming.yml
       import_tasks: teaming.yml
@@ -17,8 +17,3 @@
       import_tasks: systemd.yml
       tags: network_systemd
       when: import_network_systemd
-
-    - name: import tasks from kernel_settings.yml
-      import_tasks: kernel_settings.yml
-      tags: network_kernel_settings
-      when: import_network_kernel_settings
