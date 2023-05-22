@@ -73,7 +73,6 @@
     group: root
     mode: 0644
   vars:
-    name: '{{ item.name }}'
     sections: '{{ item.sections }}'
   notify: restart systemd-networkd
   loop: "{{ network_systemd_network | rejectattr('name', 'equalto', '') | list }}"
@@ -88,7 +87,6 @@
     group: root
     mode: 0644
   vars:
-    name: '{{ item.name }}'
     sections: '{{ item.sections }}'
   notify: restart systemd-networkd
   loop: "{{ network_systemd_netdev | rejectattr('name', 'equalto', '') | list }}"
@@ -103,7 +101,6 @@
     group: root
     mode: 0644
   vars:
-    name: '{{ item.name }}'
     sections: '{{ item.sections }}'
   notify: update initramfs
   loop: "{{ network_systemd_link | rejectattr('name', 'equalto', '') | list }}"
