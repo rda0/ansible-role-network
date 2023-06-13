@@ -116,6 +116,12 @@
     mode: 0644
   notify: restart systemd-resolved
 
+- name: install systemd-resolved
+  package:
+    name: systemd-resolved
+    state: present
+  when: ansible_distribution_release not in ['buster', 'bullseye', 'bionic', 'focal', 'jammy']
+
 - name: install libnss-resolve
   package:
     name: libnss-resolve
