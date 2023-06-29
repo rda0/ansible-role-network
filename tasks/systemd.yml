@@ -107,6 +107,13 @@
   loop_control:
     label: "{{ item.name }}"
 
+- name: enable and start systemd-networkd
+  systemd:
+    name: systemd-networkd
+    enabled: yes
+    state: started
+    daemon_reload: yes
+
 - name: deploy /etc/systemd/resolved.conf
   template:
     src: resolved.conf.j2
@@ -168,13 +175,6 @@
     state: link
     force: yes
   when: network_systemd_resolved_stub
-
-- name: enable and start systemd-networkd
-  systemd:
-    name: systemd-networkd
-    enabled: yes
-    state: started
-    daemon_reload: yes
 
 - name: disable networking
   service:
