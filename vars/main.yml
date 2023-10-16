@@ -11,15 +11,24 @@ _network_ipv6_address: '{{ _network_ipv6_ip }}/{{ _network_ipv6_prefixlen }}'
 _network_ipv6_gateway: "{{ globalvars_subnets[_network_ipv6_subnet]['gateway_address'] | default('') }}"
 _network_ipv6_ra: "{% if not network_systemd_ipv6_accept_ra %}IPv6AcceptRA=false{% endif %}"
 
-network_systemd_host_address_params:
+_network_address_params_ipv4_address:
   - "Address={{ _network_ipv4_address }}"
+_network_address_params_ipv4_gateway:
   - "Gateway={{ _network_ipv4_gateway }}"
+_network_address_params_ipv4_dns:
   - '{% if network_systemd_dns_ipv4 and not network_systemd_resolved_global_dns %}DNS={{ network_systemd_dns_ipv4 }}{% endif %}'
   - '{% if not network_systemd_resolved_global_dns %}Domains={{ network_systemd_domains }}{% endif %}'
+_network_address_params_ipv6_address:
   - "{% if _network_has_ipv6 %}Address={{ _network_ipv6_address }}{% endif %}"
+_network_address_params_ipv6_gateway:
   - "{% if _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) %}Gateway={{ _network_ipv6_gateway }}{% endif %}"
+_network_address_params_ipv6_ra:
   - '{{ _network_ipv6_ra }}'
+_network_address_params_ipv6_dns:
   - "{% if _network_has_ipv6 and network_systemd_dns_ipv6 and not network_systemd_resolved_global_dns %}DNS={{ network_systemd_dns_ipv6 }}{% endif %}"
+
+network_systemd_host_address_params: '{{ _network_address_params_ipv4_address + _network_address_params_ipv4_gateway + _network_address_params_ipv4_dns + _network_address_params_ipv6_address + _network_address_params_ipv6_gateway + _network_address_params_ipv6_ra + _network_address_params_ipv6_dns }}'
+network_systemd_host_address_params_no_gateway: '{{ _network_address_params_ipv4_address + _network_address_params_ipv4_dns + _network_address_params_ipv6_address + _network_address_params_ipv6_ra + _network_address_params_ipv6_dns }}'
 
 network_systemd_network_templates:
   default_dhcp:
@@ -80,7 +89,15 @@ network_systemd_network_templates:
       - name: Match
         params: ["Name={{ network_bond['name'] | default('') }}"]
       - name: Network
-        params: "{{ network_systemd_host_address_params + [''.join(['BindCarrier=', network_bond['interfaces'][0] | default(''), ' ', network_bond['interfaces'][1] | default('')])] }}"
+        params: "{{ network_systemd_host_address_params_no_gateway + [''.join(['BindCarrier=', network_bond['interfaces'][0] | default(''), ' ', network_bond['interfaces'][1] | default('')])] }}"
+      - name: Route
+        params:
+          - 'Gateway={{ _network_ipv4_gateway }}'
+          - 'GatewayOnLink=true'
+      - name: "{{ 'Route' if _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) else '' }}"
+        params:
+          - 'Gateway={{ _network_ipv6_gateway }}'
+          - 'GatewayOnLink=true'
   bond_2vlans_2bridges:
     - name: "{{ '' if network_interface in network_bridges | map(attribute='name') | flatten else 'host' }}"
       sections:
