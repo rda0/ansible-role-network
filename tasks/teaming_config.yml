@@ -29,7 +29,7 @@
     group: root
     mode: 0755
 
-- name: deploy teaming configuration ("{{ _network_team_config_file }}")
+- name: "deploy teaming configuration ({{ _network_team_config_file }})"
   template:
     dest: "{{ _network_team_config_file }}"
     src: teamd.conf.j2
@@ -38,14 +38,14 @@
     mode: 0644
   register: _network_deploy_teaming_config
 
-- name: deploy systemd "{{ _network_team_service }}" service
+- name: "deploy systemd {{ _network_team_service }} service"
   template:
     src: teamd.service.j2
     dest: "/etc/systemd/system/{{ _network_team_service }}.service"
     mode: 0644
   register: _network_deploy_teaming_service
 
-- name: enable systemd "{{ _network_team_service }}" service
+- name: "enable systemd {{ _network_team_service }} service"
   systemd:
     name: "{{ _network_team_service }}"
     enabled: yes
@@ -62,14 +62,14 @@
     group: root
     mode: 0755
 
-- name: create systemd-networkd override (systemd-networkd.service.d/{{ _network_team_service }}.conf)
+- name: "create systemd-networkd override (systemd-networkd.service.d/{{ _network_team_service }}.conf)"
   template:
     src: systemd-networkd.service.override.j2
     dest: "/etc/systemd/system/systemd-networkd.service.d/{{ _network_team_service }}.conf"
     mode: 0644
   register: _network_networkd_override
 
-- name: reload systemd daemon (systemd-networkd.service.d/{{ _network_team_service }}.conf)
+- name: "reload systemd daemon (systemd-networkd.service.d/{{ _network_team_service }}.conf)"
   systemd:
     daemon_reload: yes
   when: _network_networkd_override.changed
@@ -78,7 +78,7 @@
 #   teaming config changed
 #   teaming service definition changed
 #   teaming service definition is new
-- name: schedule restart of {{ _network_team_service }}.service
+- name: "schedule restart of {{ _network_team_service }}.service"
   set_fact:
     _network_restart_team_service: "{{ _network_restart_team_service + [_network_team_service] }}"
   when: _network_deploy_teaming_config.changed or _network_deploy_teaming_service.changed or _network_enable_teaming_service.changed
