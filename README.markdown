@@ -36,7 +36,7 @@ network_systemd_network:
       params:
         - 'DHCP=ipv4'
         - 'Domains=phys.ethz.ch ethz.ch'
-    - name: DHCP
+    - name: DHCPv4
       params:
         - 'UseDomains=true'
         - 'UseNTP=true'

@@ -41,7 +41,7 @@ network_systemd_network_templates:
           - 'DHCP=ipv4'
           - 'Domains={{ network_systemd_domains }}'
           - '{{ _network_ipv6_ra }}'
-      - name: DHCP
+      - name: DHCPv4
         params:
           - 'UseDomains=true'
           - 'UseNTP=true'
