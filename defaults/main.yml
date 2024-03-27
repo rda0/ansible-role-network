@@ -57,6 +57,7 @@ network_systemd_link_local: []
 network_systemd_link: '{{ network_systemd_link_templates[network_systemd_link_template] + network_systemd_link_local }}'
 network_systemd_link_name_policy: keep kernel database onboard slot path
 network_systemd_link_alternative_name_policy: database onboard slot path
+network_systemd_install_wireguard_tools: False
 
 # Automatically detect when template contains a bridge
 _network_has_bridge: "{{ True if 'bridge' in network_systemd_template else False }}"
@@ -107,7 +108,6 @@ network_kernel_settings_group: {}
 
 # Override settings for use in host_vars
 network_kernel_settings: {}
-
 
 # Define which module sets (see below) should be loaded at boot
 network_kernel_module_sets: []

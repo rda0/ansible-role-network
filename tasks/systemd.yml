@@ -256,3 +256,8 @@
     name: "{{ item }}"
     state: restarted
   loop: "{{ _network_restart_team_service }}"
+
+- name: install wireguard tools
+  package:
+    name: wireguard-tools
+  when: network_systemd_install_wireguard_tools
