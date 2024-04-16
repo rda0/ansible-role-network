@@ -1,2 +1,2 @@
 dependencies:
-  - role: handlers_common
+  - role: handlers
