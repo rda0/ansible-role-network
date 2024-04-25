@@ -214,10 +214,6 @@
 #  changed_when: False
 #  when: network_systemd_unit_networking_disable and network_systemd_etc_network_interfaces_truncate and network_systemd_etc_network_interfaces_truncate_result.changed
 
-- name: configure systemd-networkd-wait-online service
-  set_fact:
-    _network_configure_systemd_networkd_wait_online: "{{ network_systemd_networkd_wait_online_any or network_systemd_networkd_wait_online_interfaces != [] }}"
-
 - name: create systemd-networkd-wait-online.service.d directory
   file:
     path: /etc/systemd/system/systemd-networkd-wait-online.service.d
@@ -225,7 +221,7 @@
     owner: root
     group: root
     mode: 0755
-  when: _network_configure_systemd_networkd_wait_online
+  when: _network_systemd_networkd_wait_online_service_override
 
 - name: deploy systemd-networkd-wait-online.service override
   template:
@@ -235,7 +231,7 @@
     group: root
     mode: 0644
   notify: reload systemd
-  when: _network_configure_systemd_networkd_wait_online
+  when: _network_systemd_networkd_wait_online_service_override
 
 - name: "{{ network_systemd_networkd_wait_online | ternary('enable', 'disable') }} systemd-networkd-wait-online.service"
   systemd:
@@ -247,7 +243,7 @@
     path: /etc/systemd/system/systemd-networkd-wait-online.service.d
     state: absent
   notify: reload systemd
-  when: not _network_configure_systemd_networkd_wait_online
+  when: not _network_systemd_networkd_wait_online_service_override
 
 # we might be offline after this, it needs a properly configured network and
 # a restart of systemd-networkd (auotmatic via dependencies) to bring us back online.
