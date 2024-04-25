@@ -29,6 +29,10 @@ _network_address_params_ipv6_dns:
 
 network_systemd_host_address_params: '{{ _network_address_params_ipv4_address + _network_address_params_ipv4_gateway + _network_address_params_ipv4_dns + _network_address_params_ipv6_address + _network_address_params_ipv6_gateway + _network_address_params_ipv6_ra + _network_address_params_ipv6_dns }}'
 network_systemd_host_address_params_no_gateway: '{{ _network_address_params_ipv4_address + _network_address_params_ipv4_dns + _network_address_params_ipv6_address + _network_address_params_ipv6_ra + _network_address_params_ipv6_dns }}'
+# TODO: add a `Link` section with these params to every template
+network_systemd_host_link_params:
+  - '{% if network_systemd_host_link_required_for_online %}RequiredForOnline={{ network_systemd_host_link_required_for_online }}{% endif %}'
+  - '{% if network_systemd_host_link_activation_policy %}ActivationPolicy={{ network_systemd_host_link_activation_policy }}{% endif %}'
 
 network_systemd_network_templates:
   default_dhcp:
@@ -41,6 +45,8 @@ network_systemd_network_templates:
           - 'DHCP=ipv4'
           - 'Domains={{ network_systemd_domains }}'
           - '{{ _network_ipv6_ra }}'
+      - name: Link
+        params: '{{ network_systemd_host_link_params }}'
       - name: DHCPv4
         params:
           - 'UseDomains=true'

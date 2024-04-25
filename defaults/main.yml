@@ -40,9 +40,16 @@ network_systemd_remove_dhcpcd: '{{ network_systemd_clean_install }}'
 network_systemd_remove_networkd_dispatcher: '{{ network_systemd_clean_install }}'
 network_systemd_ipv6_accept_ra: False
 network_systemd_ipv6_static_gateway: True
+# See `man 1 networkctl`, default: min(degraded, routable) except for bonding, see also issue #152
+# TODO: configure in templates for hosts with static addressing (production)
+# TODO: set default to `routable`
+network_systemd_host_link_required_for_online: ''
+# See `man 5 systemd.network /ActivationPolicy` (implicit default = `up`)
+network_systemd_host_link_activation_policy: ''
 network_systemd_networkd_wait_online: True
 network_systemd_networkd_wait_online_any: False
 # See `man 1 networkctl`, default: min(degraded, routable) except for bonding, see also issue #152
+# Preferrably use `systemd.network` configuration: `network_systemd_host_link_required_for_online`
 network_systemd_networkd_wait_online_operational_state: ''
 network_systemd_networkd_wait_online_interfaces: []
 # Automatically detect when service needs override
