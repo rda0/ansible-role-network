@@ -27,7 +27,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
 - name: "deploy teaming configuration ({{ _network_team_config_file }})"
   template:
@@ -35,14 +35,14 @@
     src: teamd.conf.j2
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   register: _network_deploy_teaming_config
 
 - name: "deploy systemd {{ _network_team_service }} service"
   template:
     src: teamd.service.j2
     dest: "/etc/systemd/system/{{ _network_team_service }}.service"
-    mode: 0644
+    mode: "0644"
   register: _network_deploy_teaming_service
 
 - name: "enable systemd {{ _network_team_service }} service"
@@ -60,13 +60,13 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
 - name: "create systemd-networkd override (systemd-networkd.service.d/{{ _network_team_service }}.conf)"
   template:
     src: systemd-networkd.service.override.j2
     dest: "/etc/systemd/system/systemd-networkd.service.d/{{ _network_team_service }}.conf"
-    mode: 0644
+    mode: "0644"
   register: _network_networkd_override
 
 - name: "reload systemd daemon (systemd-networkd.service.d/{{ _network_team_service }}.conf)"
