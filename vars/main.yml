@@ -29,7 +29,6 @@ _network_address_params_ipv6_dns:
 
 network_systemd_host_address_params: '{{ _network_address_params_ipv4_address + _network_address_params_ipv4_gateway + _network_address_params_ipv4_dns + _network_address_params_ipv6_address + _network_address_params_ipv6_gateway + _network_address_params_ipv6_ra + _network_address_params_ipv6_dns }}'
 network_systemd_host_address_params_no_gateway: '{{ _network_address_params_ipv4_address + _network_address_params_ipv4_dns + _network_address_params_ipv6_address + _network_address_params_ipv6_ra + _network_address_params_ipv6_dns }}'
-# TODO: add a `Link` section with these params to every template
 network_systemd_host_link_params:
   - '{% if network_systemd_host_link_required_for_online %}RequiredForOnline={{ network_systemd_host_link_required_for_online }}{% endif %}'
   - '{% if network_systemd_host_link_activation_policy %}ActivationPolicy={{ network_systemd_host_link_activation_policy }}{% endif %}'
@@ -58,6 +57,8 @@ network_systemd_network_templates:
         params: ['Name={{ network_interface }}']
       - name: Network
         params: '{{ network_systemd_host_address_params }}'
+      - name: Link
+        params: '{{ network_systemd_host_link_params }}'
   bridge_static:
     - name: '{{ network_interface }}'
       sections:
@@ -73,6 +74,8 @@ network_systemd_network_templates:
         params: ["Name={{ network_bridges[0]['name'] | default('') }}"]
       - name: Network
         params: '{{ network_systemd_host_address_params }}'
+      - name: Link
+        params: '{{ network_systemd_host_link_params }}'
   bond_static:
     - name: "{{ network_bond['interfaces'][0] | default('') }}"
       sections:
@@ -96,6 +99,8 @@ network_systemd_network_templates:
         params: ["Name={{ network_bond['name'] | default('') }}"]
       - name: Network
         params: "{{ network_systemd_host_address_params_no_gateway + [''.join(['BindCarrier=', network_bond['interfaces'][0] | default(''), ' ', network_bond['interfaces'][1] | default('')])] }}"
+      - name: Link
+        params: '{{ network_systemd_host_link_params }}'
       - name: Route
         params:
           - 'Gateway={{ _network_ipv4_gateway }}'
@@ -111,6 +116,8 @@ network_systemd_network_templates:
         params: ['Name={{ network_interface }}']
       - name: Network
         params: '{{ network_systemd_host_address_params }}'
+      - name: Link
+        params: '{{ network_systemd_host_link_params }}'
     - name: "{{ network_bond['interfaces'][0] | default('') }}"
       sections:
       - name: Match
@@ -159,6 +166,8 @@ network_systemd_network_templates:
         params: ["Name={{ network_bridges[0]['name'] | default('') }}"]
       - name: Network
         params: "{{ network_systemd_host_address_params if network_interface in network_bridges | map(attribute='name') | flatten else ['IPv6AcceptRA=false'] }}"
+      - name: Link
+        params: '{{ network_systemd_host_link_params }}'
     - name: "{{ network_bridges[1]['name'] | default('') }}"
       sections:
       - name: Match
@@ -172,6 +181,8 @@ network_systemd_network_templates:
         params: ['Name={{ network_interface }}']
       - name: Network
         params: '{{ network_systemd_host_address_params }}'
+      - name: Link
+        params: '{{ network_systemd_host_link_params }}'
     - name: "{{ network_teams['name'] | default('') }}"
       sections:
       - name: Match
@@ -203,6 +214,8 @@ network_systemd_network_templates:
         params: ["Name={{ network_bridges[0]['name'] | default('') }}"]
       - name: Network
         params: "{{ network_systemd_host_address_params if network_interface in network_bridges | map(attribute='name') | flatten else ['IPv6AcceptRA=false'] }}"
+      - name: Link
+        params: '{{ network_systemd_host_link_params }}'
     - name: "{{ network_bridges[1]['name'] | default('') }}"
       sections:
       - name: Match

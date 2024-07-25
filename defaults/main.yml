@@ -41,9 +41,7 @@ network_systemd_remove_networkd_dispatcher: '{{ network_systemd_clean_install }}
 network_systemd_ipv6_accept_ra: False
 network_systemd_ipv6_static_gateway: True
 # See `man 1 networkctl`, default: min(degraded, routable) except for bonding, see also issue #152
-# TODO: configure in templates for hosts with static addressing (production)
-# TODO: set default to `routable`
-network_systemd_host_link_required_for_online: ''
+network_systemd_host_link_required_for_online: routable
 # See `man 5 systemd.network /ActivationPolicy` (implicit default = `up`)
 network_systemd_host_link_activation_policy: ''
 network_systemd_networkd_wait_online: True
