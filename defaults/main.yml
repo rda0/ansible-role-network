@@ -19,6 +19,7 @@ network_systemd_domains: phys.ethz.ch ethz.ch
 # Single-label host lookups (`host <hostname>`) will break: `Host <hostname> not found: 3(NXDOMAIN)`
 #
 # Use max 3 nameservers:
+# TODO: maybe use ns2.switch.ch as 3rd nameserver on servers with public services only?
 network_systemd_dns_ipv4: 129.132.98.12 129.132.250.2
 network_systemd_dns_ipv6: 2001:67c:10ec::c
 
