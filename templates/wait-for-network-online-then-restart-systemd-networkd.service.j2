@@ -1,0 +1,12 @@
+[Unit]
+Description=Wait until network-online.target is reached then restart systemd-networkd once
+After=network.target network-online.target nss-lookup.target sssd.service
+Wants=network-online.target nss-lookup.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/systemctl restart systemd-networkd.service
+
+[Install]
+WantedBy=multi-user.target

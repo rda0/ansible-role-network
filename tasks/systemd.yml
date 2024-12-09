@@ -253,6 +253,22 @@
     state: restarted
   loop: "{{ _network_restart_team_service }}"
 
+- name: deploy wait-for-network-online-then-restart-systemd-networkd.service
+  template:
+    src: wait-for-network-online-then-restart-systemd-networkd.service.j2
+    dest: /etc/systemd/system/wait-for-network-online-then-restart-systemd-networkd.service
+    owner: root
+    group: root
+    mode: '0644'
+  when: network_systemd_networkd_wait_for_network_online_then_restart_systemd_networkd_service
+
+- name: enable wait-for-network-online-then-restart-systemd-networkd.service
+  systemd:
+    name: wait-for-network-online-then-restart-systemd-networkd.service
+    enabled: yes
+    daemon_reload: yes
+  when: network_systemd_networkd_wait_for_network_online_then_restart_systemd_networkd_service
+
 - name: install wireguard tools
   package:
     name: wireguard-tools
