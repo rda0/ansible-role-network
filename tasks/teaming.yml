@@ -3,7 +3,7 @@
     pkg:
       - libteam-utils
       - ethtool
-  when: network_teams
+  when: network_teams | length > 0
 
 - name: inlcude wipe teaming tasks
   include_tasks: teaming_wipe.yml

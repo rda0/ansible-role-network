@@ -52,7 +52,7 @@ network_systemd_networkd_wait_online_any: False
 network_systemd_networkd_wait_online_operational_state: ''
 network_systemd_networkd_wait_online_interfaces: []
 # Automatically detect when service needs override
-_network_systemd_networkd_wait_online_service_override: "{{ network_systemd_networkd_wait_online_any or network_systemd_networkd_wait_online_operational_state or network_systemd_networkd_wait_online_interfaces }}"
+_network_systemd_networkd_wait_online_service_override: "{{ network_systemd_networkd_wait_online_any or network_systemd_networkd_wait_online_operational_state or (network_systemd_networkd_wait_online_interfaces | length > 0) }}"
 # Can be used as workaround for race condition when starting netdevs which require ldap permissions
 network_systemd_networkd_wait_for_network_online_then_restart_systemd_networkd_service: False
 network_systemd_resolved_conf: ''
