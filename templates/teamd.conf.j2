@@ -1,1 +1,28 @@
-{{ _network_team_defaults | combine({'device': network_team.name}) | combine( {'ports': _network_team_ports }) | to_nice_json }}
+{
+    "device": "{{ network_team.name }}",
+    "link_watch": {
+        "name": "ethtool"
+    },
+    "ports": {
+{% for port in network_team.interfaces %}
+{% if not loop.last %}
+        "{{ port }}": {},
+{% else %}
+        "{{ port }}": {}
+{% endif %}
+{% endfor %}
+    },
+    "runner": {
+        "active": true,
+        "agg_select_policy": "bandwidth",
+        "fast_rate": true,
+        "name": "lacp",
+        "tx_balancer": {
+            "name": "basic"
+        },
+        "tx_hash": [
+            "l3",
+            "l4"
+        ]
+    }
+}

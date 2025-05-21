@@ -183,10 +183,10 @@ network_systemd_network_templates:
         params: '{{ network_systemd_host_address_params }}'
       - name: Link
         params: '{{ network_systemd_host_link_params }}'
-    - name: "{{ network_teams['name'] | default('') }}"
+    - name: "{{ network_team['name'] | default('') }}"
       sections:
       - name: Match
-        params: ["Name={{ network_teams['name'] | default('') }}"]
+        params: ["Name={{ network_team['name'] | default('') }}"]
       - name: Network
         params:
           - "VLAN={{ network_vlans['vlans'][0]['name'] | default('') }}"

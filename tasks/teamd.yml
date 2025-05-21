@@ -1,0 +1,61 @@
+- name: install teamd utils
+  package:
+    pkg:
+      - libteam-utils
+      - ethtool
+
+- name: create /etc/teamd
+  file:
+    path: /etc/teamd
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: deploy teamd config
+  template:
+    src: teamd.conf.j2
+    dest: '/etc/teamd/{{ network_team.name }}.conf'
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: create /etc/systemd/system/systemd-networkd.service.d
+  file:
+    path: /etc/systemd/system/systemd-networkd.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: create systemd-networkd override for teamd
+  template:
+    src: systemd-networkd.service.override.j2
+    dest: '/etc/systemd/system/systemd-networkd.service.d/teamd-{{ network_team.name }}.conf'
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload systemd
+
+- name: deploy teamd service
+  template:
+    src: teamd.service.j2
+    dest: '/etc/systemd/system/teamd-{{ network_team.name }}.service'
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: enable teamd service
+  systemd:
+    name: 'teamd-{{ network_team.name }}.service'
+    enabled: yes
+    daemon_reload: yes
+  ignore_errors: '{{ ansible_check_mode }}'  # ignore errors in check mode
+
+- name: switch to teamd during initial installation
+  shell: '{% for interface in network_teamd_install_interfaces %}ip link set {{ interface }} down; ip addr flush dev {{ interface }}; {% endfor %} systemctl restart teamd-{{ network_team.name }}.service; sleep 20; systemctl restart systemd-networkd.service; systemctl restart systemd-resolved.service'
+  args:
+    creates: '/run/teamd/{{ network_team.name }}.pid'
+  when: network_teamd_install_interfaces != []
+  async: '{{ ansible_check_mode | ternary(0, 90) }}'
+  poll: 1

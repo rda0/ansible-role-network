@@ -196,6 +196,51 @@ Set to `True` to enable IPv4 forwarding to configure the host as a router. This 
 Increase this if the conntrack table is getting full, otherwise connections may get dropped.
 
 
+teamd
+-----
+
+To enable teamd, use (example):
+
+```yaml
+include_network_teamd: True
+network_team:
+  name: team1
+  interfaces: ['eno1', 'eno2']
+```
+
+The teamd config uses the following settings:
+
+```yaml
+device: team1                     # will be filled with `network_team.name`
+runner:
+  name: lacp                      # Use 802.3ad LACP
+  active: True
+  fast_rate: True                 # query LACPDU packets every 1s, instead of every 30s
+  tx_hash: ['l3', 'l4']           # use l3 (src/dst ip4, ip6) and l4 (src/dst TCP, UDP, SCTP ports)
+  agg_select_policy: bandwidth    # aggregator with highest total bandwidth
+  tx_balancer:
+    name: basic                   # use active TX balancing
+link_watch:
+  name: ethtool                   # use ethtool to detect dead/alive link
+ports: {}                         # will be filled with `network_team.interfaces`
+```
+
+### installation
+
+Set `network_teamd_install_interfaces` to automatically switch to teamd during initial installation:
+
+```yaml
+network_teamd_install_interfaces: ['eno2', 'eno2.2552']
+```
+
+It may still not work due to race conditions and/or ansible ssh session problems.
+If `network_teamd_install_interfaces` are not set or if it fails to switch over, a reboot is required.
+Note that a reboot is required anyway after initial setup.
+
+### debugging
+
+To test teamd install on phd-hv11, use this simple command: `rm /etc/systemd/network/*; systemctl stop systemd-networkd.service; sleep 1; systemctl stop teamd-team1.service; rm /etc/teamd/team1.conf; rm /etc/systemd/system/teamd-team1.service; rm /etc/systemd/system/multi-user.target.wants/teamd-team1.service; rm /etc/systemd/system/systemd-networkd.service.d/teamd-team1.conf; rmdir --ignore-fail-on-non-empty /etc/systemd/system/systemd-networkd.service.d; systemctl daemon-reload; ip link del team1; ip link del eno2.2552; ip link del br-dc2552; ip link del br-dc2745; ip link set eno1 down; ip link set eno2 down; ip addr flush dev eno1; ip addr flush dev eno2; ip link add link eno2 name eno2.2552 type vlan id 2552; ip addr add 129.132.80.39/25 broadcast 129.132.80.128 dev eno2.2552; ip link set eno2 up; ip link set eno2.2552 up; ip route add default via 129.132.80.1`
+
 notes
 -----
 

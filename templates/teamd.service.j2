@@ -1,14 +1,14 @@
 [Unit]
 Description=Teaming daemon - {{ network_team.name }}
 Before=network-pre.target
-ConditionPathExists={{ _network_team_config_file }}
+ConditionPathExists=/etc/teamd/{{ network_team.name }}.conf
 
 [Service]
 Type=forking
 # -o: take over existing device
 # -N: don't delete device if killed
-ExecStart=/usr/bin/teamd -d -o -N -f {{ _network_team_config_file }}
-ExecStop=/usr/bin/teamd -f {{ _network_team_config_file }} -k
+ExecStart=/usr/bin/teamd -d -o -N -f /etc/teamd/{{ network_team.name }}.conf
+ExecStop=/usr/bin/teamd -f /etc/teamd/{{ network_team.name }}.conf -k
 Restart=always
 
 [Install]

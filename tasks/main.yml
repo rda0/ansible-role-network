@@ -8,12 +8,15 @@
       tags: network_kernel
       when: import_network_kernel
 
-    - name: import tasks teaming.yml
-      import_tasks: teaming.yml
-      tags: network_teaming
-      when: import_network_teaming
-
     - name: import tasks from systemd.yml
       import_tasks: systemd.yml
       tags: network_systemd
       when: import_network_systemd
+
+    - name: include tasks from teamd.yml
+      include_tasks:
+        file: teamd.yml
+        apply:
+          tags: network_teamd
+      tags: network_teamd
+      when: include_network_teamd
