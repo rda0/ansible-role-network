@@ -9,6 +9,7 @@ network_vlans: {}
 network_bridges: []
 network_team: {}
 
+## network_systemd variables
 network_systemd_domains: phys.ethz.ch ethz.ch
 # Due to a limitation in linux (`man resolv.conf`) and some network utilities (like `host`),
 # it is not possible to use more than 3 nameservers. systemd-networkd will work just fine,
@@ -22,7 +23,6 @@ network_systemd_domains: phys.ethz.ch ethz.ch
 # TODO: maybe use ns2.switch.ch as 3rd nameserver on servers with public services only?
 network_systemd_dns_ipv4: 129.132.98.12 129.132.250.2
 network_systemd_dns_ipv6: 2001:67c:10ec::c
-
 network_systemd_restart: True
 network_systemd_wipe: False
 network_systemd_clean_install: True
@@ -69,8 +69,8 @@ network_systemd_link: '{{ network_systemd_link_templates[network_systemd_link_te
 network_systemd_link_name_policy: keep kernel database onboard slot path
 network_systemd_link_alternative_name_policy: database onboard slot path
 network_systemd_install_wireguard_tools: False
-network_teamd_install_interfaces: []
 
+## common variables
 # Automatically detect when template contains a bridge
 _network_has_bridge: "{{ True if 'bridge' in network_systemd_template else False }}"
 # Automatically detect when template contains a bridge and has a dedicated management interface not on the bridge
@@ -85,8 +85,7 @@ network_netfilter_nf_conntrack_max: '65536'
 network_kernel_settings_filename: "91-net.conf"
 network_kernel_settings_file: "/etc/sysctl.d/{{ network_kernel_settings_filename }}"
 
-# Defaults for teamd
-
+## network_kernel variables
 # Kernel settings to configure via sysctl
 # <kernel_setting_variable>:
 #   <kernel_setting_name>:
@@ -95,10 +94,6 @@ network_kernel_settings_file: "/etc/sysctl.d/{{ network_kernel_settings_filename
 #     default: the kernel's default value (optional for settings with no default -> `null`)
 # Will only be modified/configured if value is not equal to default
 # Do not set default for kernel settings with no static defined default (or use `null`)
-
-# Internal variables
-_network_kernel_settings: {}
-
 # Variable for definition of kernel settings default values, static kernel default must be set here
 network_kernel_settings_defaults:
   net.ipv4.conf.all.arp_ignore:
@@ -116,24 +111,14 @@ network_kernel_settings_defaults:
   net.ipv4.tcp_mtu_probing:
     value: "{{ network_ipv4_ip_mtu_probing }}"
     default: '0'
-
 # Override settings for use in group_vars
 network_kernel_settings_group: {}
-
 # Override settings for use in host_vars
 network_kernel_settings: {}
-
+# Internal variables
+_network_kernel_settings: {}
 # Define which module sets (see below) should be loaded at boot
 network_kernel_module_sets: []
 
-# Define sets of modules
-#  - name: name of the set of modules
-#  - modules: a list of the modules
-_network_kernel_module_sets:
-  - name: infiniband
-    modules:
-      - mlx4_ib     # mellanox driver
-      - ib_ipoib    # IP over infiniband
-      - rdma_ucm    # iSER
-      - ib_uverbs   # userspace verb access
-      - ib_umad     # userspace management datagrams
+## network_teamd variables
+network_teamd_install_interfaces: []

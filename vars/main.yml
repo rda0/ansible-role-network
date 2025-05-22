@@ -349,3 +349,15 @@ network_systemd_link_templates:
           - 'NamePolicy={{ network_systemd_link_name_policy }}'
           - 'AlternativeNamesPolicy={{ network_systemd_link_alternative_name_policy }}'
           - 'MACAddressPolicy=persistent'
+
+# Define sets of modules
+#  - name: name of the set of modules
+#  - modules: a list of the modules
+_network_kernel_module_sets:
+  - name: infiniband
+    modules:
+      - mlx4_ib     # mellanox driver
+      - ib_ipoib    # IP over infiniband
+      - rdma_ucm    # iSER
+      - ib_uverbs   # userspace verb access
+      - ib_umad     # userspace management datagrams
