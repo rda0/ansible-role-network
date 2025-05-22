@@ -56,6 +56,6 @@
   shell: '{% for interface in network_teamd_install_interfaces %}ip link set {{ interface }} down; ip addr flush dev {{ interface }}; {% endfor %} systemctl restart teamd-{{ network_team.name }}.service; sleep 20; systemctl restart systemd-networkd.service; systemctl restart systemd-resolved.service'
   args:
     creates: '/run/teamd/{{ network_team.name }}.pid'
-  when: network_teamd_install_interfaces != []
+  when: network_teamd_install_interfaces | length > 0
   async: '{{ ansible_check_mode | ternary(0, 90) }}'
   poll: 1
