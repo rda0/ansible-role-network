@@ -103,10 +103,12 @@ network_systemd_network_templates:
         params: '{{ network_systemd_host_link_params }}'
       - name: Route
         params:
+          - 'Destination=0.0.0.0/0'
           - 'Gateway={{ _network_ipv4_gateway }}'
           - 'GatewayOnLink=true'
       - name: "{{ 'Route' if _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) else '' }}"
         params:
+          - 'Destination=::/0'
           - 'Gateway={{ _network_ipv6_gateway }}'
           - 'GatewayOnLink=true'
   bond_2vlans_2bridges:
@@ -115,9 +117,19 @@ network_systemd_network_templates:
       - name: Match
         params: ['Name={{ network_interface }}']
       - name: Network
-        params: '{{ network_systemd_host_address_params }}'
+        params: '{{ network_systemd_host_address_params_no_gateway }}'
       - name: Link
         params: '{{ network_systemd_host_link_params }}'
+      - name: Route
+        params:
+          - 'Destination=0.0.0.0/0'
+          - 'Gateway={{ _network_ipv4_gateway }}'
+          - 'GatewayOnLink=true'
+      - name: "{{ 'Route' if _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) else '' }}"
+        params:
+          - 'Destination=::/0'
+          - 'Gateway={{ _network_ipv6_gateway }}'
+          - 'GatewayOnLink=true'
     - name: "{{ network_bond['interfaces'][0] | default('') }}"
       sections:
       - name: Match
@@ -165,9 +177,19 @@ network_systemd_network_templates:
       - name: Match
         params: ["Name={{ network_bridges[0]['name'] | default('') }}"]
       - name: Network
-        params: "{{ network_systemd_host_address_params if network_interface in network_bridges | map(attribute='name') | flatten else ['IPv6AcceptRA=false'] }}"
+        params: "{{ network_systemd_host_address_params_no_gateway if network_interface in network_bridges | map(attribute='name') | flatten else ['IPv6AcceptRA=false'] }}"
       - name: Link
         params: '{{ network_systemd_host_link_params }}'
+      - name: Route
+        params:
+          - 'Destination=0.0.0.0/0'
+          - 'Gateway={{ _network_ipv4_gateway }}'
+          - 'GatewayOnLink=true'
+      - name: "{{ 'Route' if _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) else '' }}"
+        params:
+          - 'Destination=::/0'
+          - 'Gateway={{ _network_ipv6_gateway }}'
+          - 'GatewayOnLink=true'
     - name: "{{ network_bridges[1]['name'] | default('') }}"
       sections:
       - name: Match
