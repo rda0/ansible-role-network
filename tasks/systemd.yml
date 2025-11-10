@@ -135,7 +135,7 @@
   package:
     name: systemd-resolved
     state: present
-  when: ansible_distribution_release not in ['bullseye']
+  when: ansible_facts.distribution_release not in ['bullseye']
 
 - name: install libnss-resolve
   package:
