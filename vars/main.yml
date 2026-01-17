@@ -37,213 +37,213 @@ network_systemd_network_templates:
   default_dhcp:
     - name: host
       sections:
-      - name: Match
-        params: ['Name={{ network_interface }}']
-      - name: Network
-        params:
-          - 'DHCP=ipv4'
-          - 'Domains={{ network_systemd_domains }}'
-          - '{{ _network_ipv6_ra }}'
-      - name: Link
-        params: '{{ network_systemd_host_link_params }}'
-      - name: DHCPv4
-        params:
-          - 'UseDomains=true'
-          - 'UseNTP=true'
+        - name: Match
+          params: ['Name={{ network_interface }}']
+        - name: Network
+          params:
+            - 'DHCP=ipv4'
+            - 'Domains={{ network_systemd_domains }}'
+            - '{{ _network_ipv6_ra }}'
+        - name: Link
+          params: '{{ network_systemd_host_link_params }}'
+        - name: DHCPv4
+          params:
+            - 'UseDomains=true'
+            - 'UseNTP=true'
   default_static:
     - name: host
       sections:
-      - name: Match
-        params: ['Name={{ network_interface }}']
-      - name: Network
-        params: '{{ network_systemd_host_address_params }}'
-      - name: Link
-        params: '{{ network_systemd_host_link_params }}'
+        - name: Match
+          params: ['Name={{ network_interface }}']
+        - name: Network
+          params: '{{ network_systemd_host_address_params }}'
+        - name: Link
+          params: '{{ network_systemd_host_link_params }}'
   bridge_static:
     - name: '{{ network_interface }}'
       sections:
-      - name: Match
-        params: ['Name={{ network_interface }}']
-      - name: Network
-        params:
-          - "Bridge={{ network_bridges[0]['name'] | default('') }}"
-          - '{{ _network_ipv6_ra }}'
+        - name: Match
+          params: ['Name={{ network_interface }}']
+        - name: Network
+          params:
+            - "Bridge={{ network_bridges[0]['name'] | default('') }}"
+            - '{{ _network_ipv6_ra }}'
     - name: "{{ network_bridges[0]['name'] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_bridges[0]['name'] | default('') }}"]
-      - name: Network
-        params: '{{ network_systemd_host_address_params }}'
-      - name: Link
-        params: '{{ network_systemd_host_link_params }}'
+        - name: Match
+          params: ["Name={{ network_bridges[0]['name'] | default('') }}"]
+        - name: Network
+          params: '{{ network_systemd_host_address_params }}'
+        - name: Link
+          params: '{{ network_systemd_host_link_params }}'
   bond_static:
     - name: "{{ network_bond['interfaces'][0] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_bond['interfaces'][0] | default('') }}"]
-      - name: Network
-        params:
-          - "Bond={{ network_bond['name'] | default('') }}"
-          - '{{ _network_ipv6_ra }}'
+        - name: Match
+          params: ["Name={{ network_bond['interfaces'][0] | default('') }}"]
+        - name: Network
+          params:
+            - "Bond={{ network_bond['name'] | default('') }}"
+            - '{{ _network_ipv6_ra }}'
     - name: "{{ network_bond['interfaces'][1] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_bond['interfaces'][1] | default('') }}"]
-      - name: Network
-        params:
-          - "Bond={{ network_bond['name'] | default('') }}"
-          - '{{ _network_ipv6_ra }}'
+        - name: Match
+          params: ["Name={{ network_bond['interfaces'][1] | default('') }}"]
+        - name: Network
+          params:
+            - "Bond={{ network_bond['name'] | default('') }}"
+            - '{{ _network_ipv6_ra }}'
     - name: "{{ network_bond['name'] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_bond['name'] | default('') }}"]
-      - name: Network
-        params: "{{ network_systemd_host_address_params_no_gateway + [''.join(['BindCarrier=', network_bond['interfaces'][0] | default(''), ' ', network_bond['interfaces'][1] | default('')])] }}"
-      - name: Link
-        params: '{{ network_systemd_host_link_params }}'
-      - name: Route
-        params:
-          - 'Destination=0.0.0.0/0'
-          - 'Gateway={{ _network_ipv4_gateway }}'
-          - 'GatewayOnLink=true'
-      - name: "{{ 'Route' if _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) else '' }}"
-        params:
-          - 'Destination=::/0'
-          - 'Gateway={{ _network_ipv6_gateway }}'
-          - 'GatewayOnLink=true'
+        - name: Match
+          params: ["Name={{ network_bond['name'] | default('') }}"]
+        - name: Network
+          params: "{{ network_systemd_host_address_params_no_gateway + [''.join(['BindCarrier=', network_bond['interfaces'][0] | default(''), ' ', network_bond['interfaces'][1] | default('')])] }}"
+        - name: Link
+          params: '{{ network_systemd_host_link_params }}'
+        - name: Route
+          params:
+            - 'Destination=0.0.0.0/0'
+            - 'Gateway={{ _network_ipv4_gateway }}'
+            - 'GatewayOnLink=true'
+        - name: "{{ 'Route' if _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) else '' }}"
+          params:
+            - 'Destination=::/0'
+            - 'Gateway={{ _network_ipv6_gateway }}'
+            - 'GatewayOnLink=true'
   bond_2vlans_2bridges:
     - name: "{{ '' if network_interface in network_bridges | map(attribute='name') | flatten else 'host' }}"
       sections:
-      - name: Match
-        params: ['Name={{ network_interface }}']
-      - name: Network
-        params: '{{ network_systemd_host_address_params_no_gateway }}'
-      - name: Link
-        params: '{{ network_systemd_host_link_params }}'
-      - name: Route
-        params:
-          - 'Destination=0.0.0.0/0'
-          - 'Gateway={{ _network_ipv4_gateway }}'
-          - 'GatewayOnLink=true'
-      - name: "{{ 'Route' if _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) else '' }}"
-        params:
-          - 'Destination=::/0'
-          - 'Gateway={{ _network_ipv6_gateway }}'
-          - 'GatewayOnLink=true'
+        - name: Match
+          params: ['Name={{ network_interface }}']
+        - name: Network
+          params: '{{ network_systemd_host_address_params_no_gateway }}'
+        - name: Link
+          params: '{{ network_systemd_host_link_params }}'
+        - name: Route
+          params:
+            - 'Destination=0.0.0.0/0'
+            - 'Gateway={{ _network_ipv4_gateway }}'
+            - 'GatewayOnLink=true'
+        - name: "{{ 'Route' if _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) else '' }}"
+          params:
+            - 'Destination=::/0'
+            - 'Gateway={{ _network_ipv6_gateway }}'
+            - 'GatewayOnLink=true'
     - name: "{{ network_bond['interfaces'][0] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_bond['interfaces'][0] | default('') }}"]
-      - name: Network
-        params:
-          - "Bond={{ network_bond['name'] | default('') }}"
-          - '{{ _network_ipv6_ra }}'
+        - name: Match
+          params: ["Name={{ network_bond['interfaces'][0] | default('') }}"]
+        - name: Network
+          params:
+            - "Bond={{ network_bond['name'] | default('') }}"
+            - '{{ _network_ipv6_ra }}'
     - name: "{{ network_bond['interfaces'][1] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_bond['interfaces'][1] | default('') }}"]
-      - name: Network
-        params:
-          - "Bond={{ network_bond['name'] | default('') }}"
-          - '{{ _network_ipv6_ra }}'
+        - name: Match
+          params: ["Name={{ network_bond['interfaces'][1] | default('') }}"]
+        - name: Network
+          params:
+            - "Bond={{ network_bond['name'] | default('') }}"
+            - '{{ _network_ipv6_ra }}'
     - name: "{{ network_bond['name'] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_bond['name'] | default('') }}"]
-      - name: Network
-        params:
-          - "BindCarrier={{ network_bond['interfaces'][0] | default('') }} {{ network_bond['interfaces'][1] | default('') }}"
-          - "VLAN={{ network_vlans['vlans'][0]['name'] | default('') }}"
-          - "VLAN={{ network_vlans['vlans'][1]['name'] | default('') }}"
-          - '{{ _network_ipv6_ra }}'
+        - name: Match
+          params: ["Name={{ network_bond['name'] | default('') }}"]
+        - name: Network
+          params:
+            - "BindCarrier={{ network_bond['interfaces'][0] | default('') }} {{ network_bond['interfaces'][1] | default('') }}"
+            - "VLAN={{ network_vlans['vlans'][0]['name'] | default('') }}"
+            - "VLAN={{ network_vlans['vlans'][1]['name'] | default('') }}"
+            - '{{ _network_ipv6_ra }}'
     - name: "{{ network_vlans['vlans'][0]['name'] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_vlans['vlans'][0]['name'] | default('') }}"]
-      - name: Network
-        params:
-          - "Bridge={{ network_bridges[0]['name'] | default('') }}"
-          - '{{ _network_ipv6_ra }}'
+        - name: Match
+          params: ["Name={{ network_vlans['vlans'][0]['name'] | default('') }}"]
+        - name: Network
+          params:
+            - "Bridge={{ network_bridges[0]['name'] | default('') }}"
+            - '{{ _network_ipv6_ra }}'
     - name: "{{ network_vlans['vlans'][1]['name'] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_vlans['vlans'][1]['name'] | default('') }}"]
-      - name: Network
-        params:
-          - "Bridge={{ network_bridges[1]['name'] | default('') }}"
-          - '{{ _network_ipv6_ra }}'
+        - name: Match
+          params: ["Name={{ network_vlans['vlans'][1]['name'] | default('') }}"]
+        - name: Network
+          params:
+            - "Bridge={{ network_bridges[1]['name'] | default('') }}"
+            - '{{ _network_ipv6_ra }}'
     - name: "{{ network_bridges[0]['name'] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_bridges[0]['name'] | default('') }}"]
-      - name: Network
-        params: "{{ network_systemd_host_address_params_no_gateway if network_interface in network_bridges | map(attribute='name') | flatten else ['IPv6AcceptRA=false'] }}"
-      - name: Link
-        params: '{{ network_systemd_host_link_params }}'
-      - name: Route
-        params:
-          - 'Destination=0.0.0.0/0'
-          - 'Gateway={{ _network_ipv4_gateway }}'
-          - 'GatewayOnLink=true'
-      - name: "{{ 'Route' if _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) else '' }}"
-        params:
-          - 'Destination=::/0'
-          - 'Gateway={{ _network_ipv6_gateway }}'
-          - 'GatewayOnLink=true'
+        - name: Match
+          params: ["Name={{ network_bridges[0]['name'] | default('') }}"]
+        - name: Network
+          params: "{{ network_systemd_host_address_params_no_gateway if network_interface in network_bridges | map(attribute='name') | flatten else ['IPv6AcceptRA=false'] }}"
+        - name: Link
+          params: '{{ network_systemd_host_link_params }}'
+        - name: Route
+          params:
+            - 'Destination=0.0.0.0/0'
+            - 'Gateway={{ _network_ipv4_gateway }}'
+            - 'GatewayOnLink=true'
+        - name: "{{ 'Route' if _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) else '' }}"
+          params:
+            - 'Destination=::/0'
+            - 'Gateway={{ _network_ipv6_gateway }}'
+            - 'GatewayOnLink=true'
     - name: "{{ network_bridges[1]['name'] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_bridges[1]['name'] | default('') }}"]
-      - name: Network
-        params: ['IPv6AcceptRA=false']
+        - name: Match
+          params: ["Name={{ network_bridges[1]['name'] | default('') }}"]
+        - name: Network
+          params: ['IPv6AcceptRA=false']
   team_2vlans_2bridges:
     - name: "{{ '' if network_interface in network_bridges | map(attribute='name') | flatten else 'host' }}"
       sections:
-      - name: Match
-        params: ['Name={{ network_interface }}']
-      - name: Network
-        params: '{{ network_systemd_host_address_params }}'
-      - name: Link
-        params: '{{ network_systemd_host_link_params }}'
+        - name: Match
+          params: ['Name={{ network_interface }}']
+        - name: Network
+          params: '{{ network_systemd_host_address_params }}'
+        - name: Link
+          params: '{{ network_systemd_host_link_params }}'
     - name: "{{ network_team['name'] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_team['name'] | default('') }}"]
-      - name: Network
-        params:
-          - "VLAN={{ network_vlans['vlans'][0]['name'] | default('') }}"
-          - "VLAN={{ network_vlans['vlans'][1]['name'] | default('') }}"
-          - '{{ _network_ipv6_ra }}'
+        - name: Match
+          params: ["Name={{ network_team['name'] | default('') }}"]
+        - name: Network
+          params:
+            - "VLAN={{ network_vlans['vlans'][0]['name'] | default('') }}"
+            - "VLAN={{ network_vlans['vlans'][1]['name'] | default('') }}"
+            - '{{ _network_ipv6_ra }}'
     - name: "{{ network_vlans['vlans'][0]['name'] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_vlans['vlans'][0]['name'] | default('') }}"]
-      - name: Network
-        params:
-          - "Bridge={{ network_bridges[0]['name'] | default('') }}"
-          - '{{ _network_ipv6_ra }}'
+        - name: Match
+          params: ["Name={{ network_vlans['vlans'][0]['name'] | default('') }}"]
+        - name: Network
+          params:
+            - "Bridge={{ network_bridges[0]['name'] | default('') }}"
+            - '{{ _network_ipv6_ra }}'
     - name: "{{ network_vlans['vlans'][1]['name'] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_vlans['vlans'][1]['name'] | default('') }}"]
-      - name: Network
-        params:
-          - "Bridge={{ network_bridges[1]['name'] | default('') }}"
-          - '{{ _network_ipv6_ra }}'
+        - name: Match
+          params: ["Name={{ network_vlans['vlans'][1]['name'] | default('') }}"]
+        - name: Network
+          params:
+            - "Bridge={{ network_bridges[1]['name'] | default('') }}"
+            - '{{ _network_ipv6_ra }}'
     - name: "{{ network_bridges[0]['name'] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_bridges[0]['name'] | default('') }}"]
-      - name: Network
-        params: "{{ network_systemd_host_address_params if network_interface in network_bridges | map(attribute='name') | flatten else ['IPv6AcceptRA=false'] }}"
-      - name: Link
-        params: '{{ network_systemd_host_link_params }}'
+        - name: Match
+          params: ["Name={{ network_bridges[0]['name'] | default('') }}"]
+        - name: Network
+          params: "{{ network_systemd_host_address_params if network_interface in network_bridges | map(attribute='name') | flatten else ['IPv6AcceptRA=false'] }}"
+        - name: Link
+          params: '{{ network_systemd_host_link_params }}'
     - name: "{{ network_bridges[1]['name'] | default('') }}"
       sections:
-      - name: Match
-        params: ["Name={{ network_bridges[1]['name'] | default('') }}"]
-      - name: Network
-        params: ['IPv6AcceptRA=false']
+        - name: Match
+          params: ["Name={{ network_bridges[1]['name'] | default('') }}"]
+        - name: Network
+          params: ['IPv6AcceptRA=false']
 
 network_systemd_netdev_templates:
   default_dhcp: []
@@ -251,126 +251,126 @@ network_systemd_netdev_templates:
   bridge_static:
     - name: "{{ network_bridges[0]['name'] | default('') }}"
       sections:
-      - name: NetDev
-        params:
-          - "Name={{ network_bridges[0]['name'] | default('') }}"
-          - 'Kind=bridge'
-      - name: Bridge
-        params: ['STP=off']
+        - name: NetDev
+          params:
+            - "Name={{ network_bridges[0]['name'] | default('') }}"
+            - 'Kind=bridge'
+        - name: Bridge
+          params: ['STP=off']
   bond_static:
     - name: "{{ network_bond['name'] | default('') }}"
       sections:
-      - name: NetDev
-        params:
-          - "Name={{ network_bond['name'] | default('') }}"
-          - 'Kind=bond'
-      - name: Bond
-        params:
-          - 'Mode=802.3ad'
-          - 'TransmitHashPolicy=layer3+4'
-          - 'MIIMonitorSec=1s'
-          - 'LACPTransmitRate=fast'
+        - name: NetDev
+          params:
+            - "Name={{ network_bond['name'] | default('') }}"
+            - 'Kind=bond'
+        - name: Bond
+          params:
+            - 'Mode=802.3ad'
+            - 'TransmitHashPolicy=layer3+4'
+            - 'MIIMonitorSec=1s'
+            - 'LACPTransmitRate=fast'
   bond_2vlans_2bridges:
     - name: "{{ network_bond['name'] | default('') }}"
       sections:
-      - name: NetDev
-        params:
-          - "Name={{ network_bond['name'] | default('') }}"
-          - 'Kind=bond'
-      - name: Bond
-        params:
-          - 'Mode=802.3ad'
-          - 'TransmitHashPolicy=layer3+4'
-          - 'MIIMonitorSec=1s'
-          - 'LACPTransmitRate=fast'
+        - name: NetDev
+          params:
+            - "Name={{ network_bond['name'] | default('') }}"
+            - 'Kind=bond'
+        - name: Bond
+          params:
+            - 'Mode=802.3ad'
+            - 'TransmitHashPolicy=layer3+4'
+            - 'MIIMonitorSec=1s'
+            - 'LACPTransmitRate=fast'
     - name: "{{ network_vlans['vlans'][0]['name'] | default('') }}"
       sections:
-      - name: NetDev
-        params:
-          - "Name={{ network_vlans['vlans'][0]['name'] | default('') }}"
-          - 'Kind=vlan'
-      - name: VLAN
-        params: ["Id={{ network_vlans['vlans'][0]['id'] | default('') }}"]
+        - name: NetDev
+          params:
+            - "Name={{ network_vlans['vlans'][0]['name'] | default('') }}"
+            - 'Kind=vlan'
+        - name: VLAN
+          params: ["Id={{ network_vlans['vlans'][0]['id'] | default('') }}"]
     - name: "{{ network_vlans['vlans'][1]['name'] | default('') }}"
       sections:
-      - name: NetDev
-        params:
-          - "Name={{ network_vlans['vlans'][1]['name'] | default('') }}"
-          - 'Kind=vlan'
-      - name: VLAN
-        params: ["Id={{ network_vlans['vlans'][1]['id'] | default('') }}"]
+        - name: NetDev
+          params:
+            - "Name={{ network_vlans['vlans'][1]['name'] | default('') }}"
+            - 'Kind=vlan'
+        - name: VLAN
+          params: ["Id={{ network_vlans['vlans'][1]['id'] | default('') }}"]
     - name: "{{ network_bridges[0]['name'] | default('') }}"
       sections:
-      - name: NetDev
-        params:
-          - "Name={{ network_bridges[0]['name'] | default('') }}"
-          - 'Kind=bridge'
-      - name: Bridge
-        params: ['STP=off']
+        - name: NetDev
+          params:
+            - "Name={{ network_bridges[0]['name'] | default('') }}"
+            - 'Kind=bridge'
+        - name: Bridge
+          params: ['STP=off']
     - name: "{{ network_bridges[1]['name'] | default('') }}"
       sections:
-      - name: NetDev
-        params:
-          - "Name={{ network_bridges[1]['name'] | default('') }}"
-          - 'Kind=bridge'
-      - name: Bridge
-        params: ['STP=off']
+        - name: NetDev
+          params:
+            - "Name={{ network_bridges[1]['name'] | default('') }}"
+            - 'Kind=bridge'
+        - name: Bridge
+          params: ['STP=off']
   team_2vlans_2bridges:
     - name: "{{ network_vlans['vlans'][0]['name'] | default('') }}"
       sections:
-      - name: NetDev
-        params:
-          - "Name={{ network_vlans['vlans'][0]['name'] | default('') }}"
-          - 'Kind=vlan'
-      - name: VLAN
-        params: ["Id={{ network_vlans['vlans'][0]['id'] | default('') }}"]
+        - name: NetDev
+          params:
+            - "Name={{ network_vlans['vlans'][0]['name'] | default('') }}"
+            - 'Kind=vlan'
+        - name: VLAN
+          params: ["Id={{ network_vlans['vlans'][0]['id'] | default('') }}"]
     - name: "{{ network_vlans['vlans'][1]['name'] | default('') }}"
       sections:
-      - name: NetDev
-        params:
-          - "Name={{ network_vlans['vlans'][1]['name'] | default('') }}"
-          - 'Kind=vlan'
-      - name: VLAN
-        params: ["Id={{ network_vlans['vlans'][1]['id'] | default('') }}"]
+        - name: NetDev
+          params:
+            - "Name={{ network_vlans['vlans'][1]['name'] | default('') }}"
+            - 'Kind=vlan'
+        - name: VLAN
+          params: ["Id={{ network_vlans['vlans'][1]['id'] | default('') }}"]
     - name: "{{ network_bridges[0]['name'] | default('') }}"
       sections:
-      - name: NetDev
-        params:
-          - "Name={{ network_bridges[0]['name'] | default('') }}"
-          - 'Kind=bridge'
-      - name: Bridge
-        params: ['STP=off']
+        - name: NetDev
+          params:
+            - "Name={{ network_bridges[0]['name'] | default('') }}"
+            - 'Kind=bridge'
+        - name: Bridge
+          params: ['STP=off']
     - name: "{{ network_bridges[1]['name'] | default('') }}"
       sections:
-      - name: NetDev
-        params:
-          - "Name={{ network_bridges[1]['name'] | default('') }}"
-          - 'Kind=bridge'
-      - name: Bridge
-        params: ['STP=off']
+        - name: NetDev
+          params:
+            - "Name={{ network_bridges[1]['name'] | default('') }}"
+            - 'Kind=bridge'
+        - name: Bridge
+          params: ['STP=off']
 
 network_systemd_link_templates:
   default: []
   name_policy:
     - name: '90-name-policy'
       sections:
-      - name: Match
-        params: ['OriginalName=*']
-      - name: Link
-        params:
-          - 'NamePolicy={{ network_systemd_link_name_policy }}'
-          - 'AlternativeNamesPolicy={{ network_systemd_link_alternative_name_policy }}'
-          - 'MACAddressPolicy=persistent'
+        - name: Match
+          params: ['OriginalName=*']
+        - name: Link
+          params:
+            - 'NamePolicy={{ network_systemd_link_name_policy }}'
+            - 'AlternativeNamesPolicy={{ network_systemd_link_alternative_name_policy }}'
+            - 'MACAddressPolicy=persistent'
   name_policy_ethernet:
     - name: '90-name-policy-ethernet'
       sections:
-      - name: Match
-        params: ['Type=ether']
-      - name: Link
-        params:
-          - 'NamePolicy={{ network_systemd_link_name_policy }}'
-          - 'AlternativeNamesPolicy={{ network_systemd_link_alternative_name_policy }}'
-          - 'MACAddressPolicy=persistent'
+        - name: Match
+          params: ['Type=ether']
+        - name: Link
+          params:
+            - 'NamePolicy={{ network_systemd_link_name_policy }}'
+            - 'AlternativeNamesPolicy={{ network_systemd_link_alternative_name_policy }}'
+            - 'MACAddressPolicy=persistent'
 
 # Define sets of modules
 #  - name: name of the set of modules
