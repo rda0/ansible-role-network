@@ -68,6 +68,8 @@ network_systemd_link_local: []
 network_systemd_link: '{{ network_systemd_link_templates[network_systemd_link_template] + network_systemd_link_local }}'
 network_systemd_link_name_policy: keep kernel database onboard slot path
 network_systemd_link_alternative_name_policy: database onboard slot path
+# Set `True` to configure explicit default routes in `Route` sections for templates. Otherwise let systemd try figuring out the routes (buggy).
+network_systemd_route_section: "{{ True if network_systemd_template in ['bond_static', 'bond_2vlans_2bridges'] }}"
 network_systemd_install_wireguard_tools: False
 
 ## common variables
