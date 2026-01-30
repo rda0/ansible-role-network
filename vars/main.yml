@@ -29,11 +29,11 @@ _network_address_params_ipv6_dns:
 _network_address_params_ipv4_route:
   - 'Destination=0.0.0.0/0'
   - 'Gateway={{ _network_ipv4_gateway }}'
-  - 'GatewayOnLink=true'
+  - 'GatewayOnLink=true'  # workaround to fix issue #193 and #203
 _network_address_params_ipv6_route:
   - 'Destination=::/0'
   - 'Gateway={{ _network_ipv6_gateway }}'
-  - 'GatewayOnLink=true'
+  - 'GatewayOnLink=true'  # workaround to fix issue #193 and #203
 
 network_systemd_host_address_params: '{{ _network_address_params_ipv4_address + _network_address_params_ipv4_gateway + _network_address_params_ipv4_dns + _network_address_params_ipv6_address + _network_address_params_ipv6_gateway + _network_address_params_ipv6_ra + _network_address_params_ipv6_dns }}'
 network_systemd_host_address_params_no_gateway: '{{ _network_address_params_ipv4_address + _network_address_params_ipv4_dns + _network_address_params_ipv6_address + _network_address_params_ipv6_ra + _network_address_params_ipv6_dns }}'
@@ -65,9 +65,13 @@ network_systemd_network_templates:
         - name: Match
           params: ['Name={{ network_interface }}']
         - name: Network
-          params: '{{ network_systemd_host_address_params }}'
+          params: '{{ _network_systemd_host_address_params }}'
         - name: Link
           params: '{{ network_systemd_host_link_params }}'
+        - name: "{{ 'Route' if network_systemd_route_section else '' }}"
+          params: '{{ _network_address_params_ipv4_route }}'
+        - name: "{{ 'Route' if network_systemd_route_section and _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) else '' }}"
+          params: '{{ _network_address_params_ipv6_route }}'
   bridge_static:
     - name: '{{ network_interface }}'
       sections:
@@ -82,9 +86,13 @@ network_systemd_network_templates:
         - name: Match
           params: ["Name={{ network_bridges[0]['name'] | default('') }}"]
         - name: Network
-          params: '{{ network_systemd_host_address_params }}'
+          params: '{{ _network_systemd_host_address_params }}'
         - name: Link
           params: '{{ network_systemd_host_link_params }}'
+        - name: "{{ 'Route' if network_systemd_route_section else '' }}"
+          params: '{{ _network_address_params_ipv4_route }}'
+        - name: "{{ 'Route' if network_systemd_route_section and _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) else '' }}"
+          params: '{{ _network_address_params_ipv6_route }}'
   bond_static:
     - name: "{{ network_bond['interfaces'][0] | default('') }}"
       sections:
@@ -193,9 +201,13 @@ network_systemd_network_templates:
         - name: Match
           params: ['Name={{ network_interface }}']
         - name: Network
-          params: '{{ network_systemd_host_address_params }}'
+          params: '{{ _network_systemd_host_address_params }}'
         - name: Link
           params: '{{ network_systemd_host_link_params }}'
+        - name: "{{ 'Route' if network_systemd_route_section else '' }}"
+          params: '{{ _network_address_params_ipv4_route }}'
+        - name: "{{ 'Route' if network_systemd_route_section and _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) else '' }}"
+          params: '{{ _network_address_params_ipv6_route }}'
     - name: "{{ network_team['name'] | default('') }}"
       sections:
         - name: Match
@@ -226,9 +238,13 @@ network_systemd_network_templates:
         - name: Match
           params: ["Name={{ network_bridges[0]['name'] | default('') }}"]
         - name: Network
-          params: "{{ network_systemd_host_address_params if network_interface in network_bridges | map(attribute='name') | flatten else ['IPv6AcceptRA=false'] }}"
+          params: "{{ _network_systemd_host_address_params if network_interface in network_bridges | map(attribute='name') | flatten else ['IPv6AcceptRA=false'] }}"
         - name: Link
           params: '{{ network_systemd_host_link_params }}'
+        - name: "{{ 'Route' if network_systemd_route_section else '' }}"
+          params: '{{ _network_address_params_ipv4_route }}'
+        - name: "{{ 'Route' if network_systemd_route_section and _network_has_ipv6 and (network_systemd_ipv6_static_gateway or not network_systemd_ipv6_accept_ra) else '' }}"
+          params: '{{ _network_address_params_ipv6_route }}'
     - name: "{{ network_bridges[1]['name'] | default('') }}"
       sections:
         - name: Match
