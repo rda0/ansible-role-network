@@ -21,6 +21,21 @@
   set_fact:
     _network_kernel_settings: '{{ network_kernel_settings_defaults | combine(network_kernel_settings_group, recursive=True) | combine(network_kernel_settings, recursive=True) }}'
 
+- name: deploy /etc/modules-load.d/nf_conntrack.conf to enable early load of nf_conntrack
+  copy:
+    content: "nf_conntrack\n"
+    dest: /etc/modules-load.d/nf_conntrack.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when: network_netfilter_nf_conntrack_max != '65536'
+
+- name: remove /etc/modules-load.d/nf_conntrack.conf
+  file:
+    path: /etc/modules-load.d/nf_conntrack.conf
+    state: absent
+  when: network_netfilter_nf_conntrack_max == '65536'
+
 - name: apply sysctl kernel settings
   ansible.posix.sysctl:
     sysctl_file: '{{ network_kernel_settings_file }}'
