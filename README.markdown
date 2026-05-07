@@ -42,13 +42,6 @@ network_systemd_network:
         - 'UseNTP=true'
 ```
 
-Hosts configured as such with multiple interfaces may want to configure the wait-online service:
-
-- the default is to wait until all configures interfaces are up. Disable this with `network_systemd_networkd_wait_online: False`
-- set `network_systemd_networkd_wait_online_interfaces: ['eno1', 'eno2' ]` to wait only for `eno1` _and_ `eno2`
-- set `network_systemd_networkd_wait_online_any: True` to wait until _any_ interface is up, if `network_systemd_networkd_wait_online_interfaces` is non-empty, wait until _any of those_ interface is up
-- see systemd-networkd-wait-online.service(8) for more information
-
 Another example to configure an interface in addition to preset interfaces:
 
 ```yaml
@@ -78,6 +71,33 @@ network_systemd_netdev_local:
         - 'Name=tun0'
         - 'Kind=tun'
 ```
+
+### required interfaces
+
+Hosts configured as such with multiple interfaces may need to properly set `RequiredForOnline`.
+The wait-online service automatically waits for interfaces depending on that setting. Example:
+
+```yaml
+network_systemd_network_local:
+  - name: rescue
+    sections:
+      - name: Match
+        params: ['Name=enp3s0']
+      - name: Network
+        params:
+          - 'Address=192.168.1.11/24'
+          - 'ConfigureWithoutCarrier=true'
+      - name: Link
+        params:
+          - 'RequiredForOnline=no'
+```
+
+NOT recommended alternative: override the wait-online service:
+
+- the default is to wait until all configures interfaces are up. Disable this with `network_systemd_networkd_wait_online: False`
+- set `network_systemd_networkd_wait_online_interfaces: ['eno1', 'eno2' ]` to wait only for `eno1` _and_ `eno2`
+- set `network_systemd_networkd_wait_online_any: True` to wait until _any_ interface is up, if `network_systemd_networkd_wait_online_interfaces` is non-empty, wait until _any of those_ interface is up
+- see systemd-networkd-wait-online.service(8) for more information
 
 ### bootstrapping
 
