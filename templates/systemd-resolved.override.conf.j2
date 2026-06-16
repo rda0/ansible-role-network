@@ -1,2 +1,7 @@
 [Service]
+{% if not network_systemd_resolved_synthesize_hostname %}
+Environment=SYSTEMD_RESOLVED_SYNTHESIZE_HOSTNAME=0
+{% endif %}
+{% if network_systemd_resolved_debug %}
 Environment=SYSTEMD_LOG_LEVEL=debug
+{% endif %}

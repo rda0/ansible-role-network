@@ -129,7 +129,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart systemd-resolved
+  notify: restart systemd-resolved  # TODO: supports reload in a future release (forky?)
 
 - name: install systemd-resolved
   package:
@@ -145,11 +145,12 @@
 - name: create systemd-resolved.service.d
   file:
     path: /etc/systemd/system/systemd-resolved.service.d
-    state: "{{ network_systemd_resolved_debug | ternary('directory', 'absent') }}"  # noqa args[module]
+    state: directory
     owner: root
     group: root
     mode: '0755'
   notify: restart systemd-resolved
+  when: ansible_facts.distribution_release not in ['bullseye', 'bookworm'] or network_systemd_resolved_debug  # TODO after bookworm: remove this whole (when) line
 
 - name: override systemd-resolved.service
   template:
@@ -159,7 +160,7 @@
     group: root
     mode: '0644'
   notify: restart systemd-resolved
-  when: network_systemd_resolved_debug
+  when: ansible_facts.distribution_release not in ['bullseye', 'bookworm'] or network_systemd_resolved_debug  # TODO after bookworm: remove this whole (when) line
 
 - name: enable and start systemd-resolved
   systemd:

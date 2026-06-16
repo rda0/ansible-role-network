@@ -62,6 +62,7 @@ network_systemd_resolved_dnssec: 'no'
 network_systemd_resolved_cache: 'yes'
 network_systemd_resolved_stub: False
 network_systemd_resolved_global_dns: "{{ False if 'dhcp' in network_systemd_template else True }}"
+network_systemd_resolved_synthesize_hostname: False  # False: fixes `hostname -f` (`getent ahosts -s resolve ${HOSTNAME}`) to resolve to fqdn instead of the short host name, when `/etc/hostname` contains the short host name
 network_systemd_resolved_debug: False
 network_systemd_link_template: default
 network_systemd_link_local: []
